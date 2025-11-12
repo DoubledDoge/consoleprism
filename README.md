@@ -180,7 +180,7 @@ ColorScheme.ProgressBarComplete = ConsoleColor.Green;
 
 ## 💻 Requirements
 
-- .NET 9.0 or higher
+- .NET 10.0 or higher
 - Should work on Windows, macOS, and Linux terminals
 - Best experience with terminals with dark backgrounds (Not going to make a light theme yet maybe, sorry)
 
@@ -194,7 +194,7 @@ Contributions welcome! It’s all open source, so feel free to fork and make a p
 
 ## 🗺️ Roadmap
 
-Current version: **v0.1.0** (Pre-release)
+Current version: **v0.1.1** (Pre-release)
 
 Future considerations:
 - Object-based table data support
