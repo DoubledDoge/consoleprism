@@ -1,4 +1,6 @@
-﻿namespace ConsolePrism.Components;
+﻿using System.Text;
+
+namespace ConsolePrism.Components;
 
 using Core.Renderers;
 using Interfaces;
@@ -9,7 +11,7 @@ using Themes;
 /// text wrapping support.
 /// </summary>
 /// <remarks>
-/// Initialises a new <see cref="Table"/> with an explicit renderer.
+/// Initializes a new <see cref="Table"/> with an explicit renderer.
 /// </remarks>
 /// <param name="headers">Column header labels.</param>
 /// <param name="data">Cell data, or <see langword="null"/> for a headers-only table.</param>
@@ -36,6 +38,12 @@ public sealed class Table(
     /// </param>
     public Table(string[] headers, string[,]? data, int[]? columnWidths = null)
         : this(headers, data, ConsoleRenderer.Instance, columnWidths) { }
+
+    /// <inheritdoc />
+    protected override bool SupportsRendererSwap => false;
+
+    /// <inheritdoc />
+    protected override IRenderer? SwapRenderer(IRenderer? incoming) => null;
 
     /// <inheritdoc/>
     public override void Render()
@@ -244,29 +252,34 @@ public sealed class Table(
             return [text];
         }
 
-        List<string> lines = new List<string>();
-        string currentLine = string.Empty;
+        List<string> lines = [];
+        StringBuilder currentLine = new();
 
         foreach (string word in text.Split(' '))
         {
-            if (string.IsNullOrEmpty(currentLine))
+            if (currentLine.Length == 0)
             {
-                currentLine = word;
-            }
-            else if ((currentLine + " " + word).Length <= maxWidth)
-            {
-                currentLine += " " + word;
+                currentLine.Append(word);
             }
             else
             {
-                lines.Add(currentLine);
-                currentLine = word;
+                int prospectiveLength = currentLine.Length + 1 + word.Length;
+                if (prospectiveLength <= maxWidth)
+                {
+                    currentLine.Append(' ').Append(word);
+                }
+                else
+                {
+                    lines.Add(currentLine.ToString());
+                    currentLine.Clear();
+                    currentLine.Append(word);
+                }
             }
         }
 
-        if (!string.IsNullOrEmpty(currentLine))
+        if (currentLine.Length > 0)
         {
-            lines.Add(currentLine);
+            lines.Add(currentLine.ToString());
         }
 
         return lines;
