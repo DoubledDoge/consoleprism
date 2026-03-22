@@ -1,9 +1,8 @@
-using ConsolePrism.Components;
-using ConsolePrism.Core.Renderers;
-using ConsolePrism.Interfaces;
-
 namespace ConsolePrism.Layout;
 
+using Components;
+using Core.Renderers;
+using Interfaces;
 using Themes;
 
 /// <summary>

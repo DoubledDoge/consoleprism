@@ -1,8 +1,8 @@
-using ConsolePrism.Components;
-using ConsolePrism.Core.Renderers;
-using ConsolePrism.Interfaces;
-
 namespace ConsolePrism.Layout;
+
+using Components;
+using Core.Renderers;
+using Interfaces;
 
 /// <summary>
 /// A horizontal layout container that renders child components side by side,

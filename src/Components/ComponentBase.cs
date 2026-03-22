@@ -1,7 +1,6 @@
-using ConsolePrism.Interfaces;
-
 namespace ConsolePrism.Components;
 
+using Interfaces;
 using Themes;
 
 /// <summary>

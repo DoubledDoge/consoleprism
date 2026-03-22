@@ -1,8 +1,8 @@
-using ConsolePrism.Components;
-using ConsolePrism.Core.Renderers;
-using ConsolePrism.Interfaces;
-
 namespace ConsolePrism.Layout;
+
+using Components;
+using Core.Renderers;
+using Interfaces;
 
 /// <summary>
 /// A vertical layout container that renders a sequence of <see cref="IRenderable"/>
