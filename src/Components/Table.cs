@@ -4,6 +4,7 @@ namespace ConsolePrism.Components;
 
 using Interfaces;
 using Themes;
+using System.Text;
 
 /// <summary>
 /// A UI component that renders a bordered, auto-sizing data table with
@@ -246,28 +247,33 @@ public sealed class Table(
         }
 
         List<string> lines = new List<string>();
-        string currentLine = string.Empty;
+        StringBuilder currentLine = new StringBuilder();
 
         foreach (string word in text.Split(' '))
         {
-            if (string.IsNullOrEmpty(currentLine))
+            if (currentLine.Length == 0)
             {
-                currentLine = word;
-            }
-            else if ((currentLine + " " + word).Length <= maxWidth)
-            {
-                currentLine += " " + word;
+                currentLine.Append(word);
             }
             else
             {
-                lines.Add(currentLine);
-                currentLine = word;
+                int prospectiveLength = currentLine.Length + 1 + word.Length;
+                if (prospectiveLength <= maxWidth)
+                {
+                    currentLine.Append(' ').Append(word);
+                }
+                else
+                {
+                    lines.Add(currentLine.ToString());
+                    currentLine.Clear();
+                    currentLine.Append(word);
+                }
             }
         }
 
-        if (!string.IsNullOrEmpty(currentLine))
+        if (currentLine.Length > 0)
         {
-            lines.Add(currentLine);
+            lines.Add(currentLine.ToString());
         }
 
         return lines;
