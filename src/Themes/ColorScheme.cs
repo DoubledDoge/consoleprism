@@ -1,30 +1,58 @@
 ﻿namespace ConsolePrism.Themes;
 
-// Feel free to change these colors
-public static class ColorScheme
+/// <summary>
+/// Defines the colour palette used across all ConsolePrism components. (Default Theme)
+/// </summary>
+public class ColorScheme
 {
-    // Semantic Colors
-    public static ConsoleColor Error { get; private set; } = ConsoleColor.Red;
-    public static ConsoleColor Success { get; private set; } = ConsoleColor.Green;
-    public static ConsoleColor Warning { get; private set; } = ConsoleColor.Yellow;
-    public static ConsoleColor Info { get; private set; } = ConsoleColor.Cyan;
-    public static ConsoleColor Highlight { get; private set; } = ConsoleColor.Magenta;
+    /// <summary>Gets or sets the colour used for error messages.</summary>
+    public ConsoleColor Error { get; init; } = ConsoleColor.Red;
 
-    // UI Element Colors
-    public static ConsoleColor Primary { get; private set; } = ConsoleColor.Blue;
-    public static ConsoleColor Muted   { get; private set; } = ConsoleColor.DarkGray;
+    /// <summary>Gets or sets the colour used for success messages.</summary>
+    public ConsoleColor Success { get; init; } = ConsoleColor.Green;
 
-    // Component-Specific Colors
-    public static ConsoleColor MenuTitle { get; private set; } = ConsoleColor.Yellow;
-    public static ConsoleColor MenuOption { get; private set; } = ConsoleColor.White;
-    public static ConsoleColor MenuSelected { get; private set; } = ConsoleColor.Green;
-    public static ConsoleColor MenuBorder { get; private set; } = ConsoleColor.DarkGray;
+    /// <summary>Gets or sets the colour used for warning messages.</summary>
+    public ConsoleColor Warning { get; init; } = ConsoleColor.Yellow;
 
-    public static ConsoleColor TableHeader { get; private set; } = ConsoleColor.Cyan;
-    public static ConsoleColor TableBorder { get; private set; } = ConsoleColor.DarkGray;
-    public static ConsoleColor TableData { get; private set; } = ConsoleColor.White;
+    /// <summary>Gets or sets the colour used for informational messages.</summary>
+    public ConsoleColor Info { get; init; } = ConsoleColor.Cyan;
 
-    public static ConsoleColor ProgressBarComplete { get; private set; } = ConsoleColor.Green;
-    public static ConsoleColor ProgressBarIncomplete { get; private set; } = ConsoleColor.DarkGray;
-    public static ConsoleColor ProgressBarText { get; private set; } = ConsoleColor.White;
+    /// <summary>Gets or sets the colour used for highlighted text.</summary>
+    public ConsoleColor Highlight { get; init; } = ConsoleColor.Magenta;
+
+    /// <summary>Gets or sets the primary UI colour.</summary>
+    public ConsoleColor Primary { get; init; } = ConsoleColor.Blue;
+
+    /// <summary>Gets or sets the colour used for muted or secondary text.</summary>
+    public ConsoleColor Muted { get; init; } = ConsoleColor.DarkGray;
+
+    /// <summary>Gets or sets the colour used for menu titles.</summary>
+    public ConsoleColor MenuTitle { get; init; } = ConsoleColor.Yellow;
+
+    /// <summary>Gets or sets the colour used for unselected menu options.</summary>
+    public ConsoleColor MenuOption { get; init; } = ConsoleColor.White;
+
+    /// <summary>Gets or sets the colour used for the selected menu option.</summary>
+    public ConsoleColor MenuSelected { get; init; } = ConsoleColor.Green;
+
+    /// <summary>Gets or sets the colour used for menu borders.</summary>
+    public ConsoleColor MenuBorder { get; init; } = ConsoleColor.DarkGray;
+
+    /// <summary>Gets or sets the colour used for table headers.</summary>
+    public ConsoleColor TableHeader { get; init; } = ConsoleColor.Cyan;
+
+    /// <summary>Gets or sets the colour used for table borders.</summary>
+    public ConsoleColor TableBorder { get; init; } = ConsoleColor.DarkGray;
+
+    /// <summary>Gets or sets the colour used for table data cells.</summary>
+    public ConsoleColor TableData { get; init; } = ConsoleColor.White;
+
+    /// <summary>Gets or sets the colour used for the completed portion of a progress bar.</summary>
+    public ConsoleColor ProgressBarComplete { get; init; } = ConsoleColor.Green;
+
+    /// <summary>Gets or sets the colour used for the incomplete portion of a progress bar.</summary>
+    public ConsoleColor ProgressBarIncomplete { get; init; } = ConsoleColor.DarkGray;
+
+    /// <summary>Gets or sets the colour used for progress bar labels.</summary>
+    public ConsoleColor ProgressBarText { get; init; } = ConsoleColor.White;
 }

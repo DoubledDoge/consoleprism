@@ -9,226 +9,154 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_NOLOGO: true
+  DOTNET_VERSION: |
+    9.0.x
+    10.0.x
 
 jobs:
   validate-tag:
-    name: Prepare Release
+    name: Validate Release Tag
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.extract.outputs.version }}
-
+      is-prerelease: ${{ steps.extract.outputs.is-prerelease }}
     steps:
       - name: Extract version from tag
         id: extract
         run: |
           TAG=${GITHUB_REF#refs/tags/}
           VERSION=${TAG#v}
-
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Release version: $VERSION"
 
-          if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
-            echo "Invalid version format: $VERSION"
-            echo "Expected format: v0.1.0 or 0.1.0 (semver with optional pre-release)"
+          if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Invalid version format: $VERSION"
             exit 1
           fi
-          echo "Valid semver format"
 
-  build-and-test:
-    name: Build & Test
+          if [[ $VERSION =~ - ]]; then
+            echo "is-prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "is-prerelease=false" >> $GITHUB_OUTPUT
+          fi
+
+  build-and-pack:
+    name: Build & Pack
     runs-on: ubuntu-latest
     needs: validate-tag
     permissions:
       contents: read
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Cache NuGet packages
-        uses: actions/cache@v4
+      - name: Install workloads
+        run: dotnet workload restore
+
+      - name: Cache NuGet package
+        uses: actions/cache@v5
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
+          restore-keys: ${{ runner.os }}-nuget-
 
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build library
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Run tests
-        run: dotnet test --configuration Release --no-build --verbosity normal
-
-  pack:
-    name: Release packages
-    runs-on: ubuntu-latest
-    needs: [validate-tag, build-and-test]
-    permissions:
-      contents: read
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: 9.0.x
-
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build library
+      - name: Build
         run: dotnet build --configuration Release --no-restore
 
       - name: Pack NuGet package
         run: |
           VERSION=${{ needs.validate-tag.outputs.version }}
-          echo "Packing version: $VERSION"
-          dotnet pack --configuration Release --no-build --output ./artifacts \
-            /p:PackageVersion=$VERSION \
-            /p:AssemblyVersion=$VERSION \
-            /p:FileVersion=$VERSION \
-            /p:InformationalVersion=$VERSION
+          dotnet pack "src/ConsolePrism.csproj" \
+            --configuration Release \
+            --no-build \
+            --output ./artifacts \
+            /p:PackageVersion=$VERSION
 
-      - name: Validate package contents
-        run: |
-          echo "Package contents:"
-          ls -lh ./artifacts/
-
-          # Check if at least one package was created
-          shopt -s nullglob
-          files=(./artifacts/*.nupkg)
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "No package files found!"
-            exit 1
-          fi
-          echo "Package(s) created successfully: ${files[*]}"
-
-      - name: Upload package artifact
-        uses: actions/upload-artifact@v5
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: nuget-package-${{ needs.validate-tag.outputs.version }}
-          path: ./artifacts/*.nupkg
-          retention-days: 90
-          if-no-files-found: error
+          name: nuget-packages-${{ github.sha }}
+          path: ./artifacts/ConsolePrism.*.nupkg
+          retention-days: 7
+
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [validate-tag, build-and-pack]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: nuget-packages-${{ github.sha }}
+          path: ./artifacts
+
+      - name: Generate changelog
+        id: cliff
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: .github/cliff.toml
+          args: --verbose --latest --strip header
+        env:
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body: ${{ steps.cliff.outputs.content }}
+          draft: false
+          prerelease: ${{ needs.validate-tag.outputs.is-prerelease == 'true' }}
+          files: ./artifacts/ConsolePrism.*.nupkg
 
   publish:
-    name: Publish packages
+    name: Publish to NuGet
     runs-on: ubuntu-latest
-    needs: [validate-tag, pack]
+    needs: [validate-tag, release]
     permissions:
       contents: write
       packages: write
     environment:
       name: nuget-production
       url: https://www.nuget.org/packages/ConsolePrism/${{ needs.validate-tag.outputs.version }}
-
     steps:
-      - name: Download package artifact
-        uses: actions/download-artifact@v6
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
         with:
-          name: nuget-package-${{ needs.validate-tag.outputs.version }}
+          name: nuget-packages-${{ github.sha }}
           path: ./artifacts
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Ensure package(s) exist before release
-        run: |
-          shopt -s nullglob
-          files=(./artifacts/*.nupkg)
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "No packages found in ./artifacts"
-            exit 1
-          fi
-          echo "Found packages: ${files[*]}"
-
-      # Stable versions
       - name: Publish to NuGet.org
-        if: |
-          !contains(needs.validate-tag.outputs.version, '-alpha') &&
-          !contains(needs.validate-tag.outputs.version, '-beta') &&
-          !contains(needs.validate-tag.outputs.version, '-rc')
         run: |
-          echo "Publishing ConsolePrism v${{ needs.validate-tag.outputs.version }} to NuGet.org"
-          dotnet nuget push ./artifacts/*.nupkg \
+          dotnet nuget push ./artifacts/ConsolePrism.*.nupkg \
             --api-key ${{ secrets.NUGET_API_KEY }} \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate
 
-      # All versions (including unstable)
       - name: Publish to GitHub Packages
         run: |
-          echo "Publishing ConsolePrism v${{ needs.validate-tag.outputs.version }} to GitHub Packages"
-          dotnet nuget push ./artifacts/*.nupkg \
+          dotnet nuget push ./artifacts/ConsolePrism.*.nupkg \
             --api-key ${{ secrets.GITHUB_TOKEN }} \
-            --source https://nuget.pkg.github.com/DoubledDoge/index.json \
-            --skip-duplicate
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set release variables
-        id: set_vars
-        run: |
-          echo "VERSION=${{ needs.validate-tag.outputs.version }}" >> $GITHUB_ENV
-          echo "TAG=v${{ needs.validate-tag.outputs.version }}" >> $GITHUB_ENV
-
-      - name: Check for existing release
-        id: check_release
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const tag = process.env.TAG;
-            try {
-              await github.rest.repos.getReleaseByTag({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                tag
-              });
-              core.setOutput('exists', 'true');
-            } catch (err) {
-              core.setOutput('exists', 'false');
-            }
-        env:
-          TAG: ${{ env.TAG }}
-
-      - name: Create GitHub Release (if not exists)
-        if: steps.check_release.outputs.exists == 'false'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG }}
-          files: ./artifacts/*.nupkg
-          generate_release_notes: true
-          draft: false
-          prerelease: ${{ contains(needs.validate-tag.outputs.version, '-') }}
-          body: |
-            ## ConsolePrism v${{ needs.validate-tag.outputs.version }}
-
-            ### Installation
-            ```bash
-            dotnet add package ConsolePrism --version ${{ needs.validate-tag.outputs.version }}
-            ```
-
-      - name: Upload artifact to existing release
-        if: steps.check_release.outputs.exists == 'true'
-        run: |
-          shopt -s nullglob
-          for f in ./artifacts/*.nupkg; do
-            echo "Uploading $f to release ${{ env.TAG }}"
-            gh release upload "${{ env.TAG }}" "$f" --clobber
-          done
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json \
+            --skip-duplicate || echo "::warning::Failed to publish ConsolePrism to GitHub Packages"

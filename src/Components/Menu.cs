@@ -1,56 +1,154 @@
-﻿namespace ConsolePrism.Components;
+﻿using ConsolePrism.Core.Renderers;
+
+namespace ConsolePrism.Components;
 
 using Core;
+using Interfaces;
 using Themes;
 
-public static class Menu
+/// <summary>
+/// A UI component that renders interactive and static menu styles,
+/// allowing users to select from a list of options.
+/// </summary>
+/// <param name="title">The menu title.</param>
+/// <param name="renderer">The renderer to write output to.</param>
+/// <param name="style">The visual style used to render the menu.</param>
+/// <param name="options">The selectable options.</param>
+public sealed class Menu(
+    string title,
+    IRenderer renderer,
+    MenuStyle style = MenuStyle.Interactive,
+    params string[] options
+) : ComponentBase, IInteractable
 {
-    public static int DisplayNumbered(string title, params string[] options) =>
-        DisplayNumbered(title, options.ToList());
+    private IRenderer _renderer = renderer;
+    private readonly List<string> _options = [.. options];
+    private string Title { get; } = title;
+    private MenuStyle Style { get; } = style;
 
-    private static int DisplayNumbered(string title, List<string> options)
+    /// <summary>
+    /// Initializes a new <see cref="Menu"/> with a title, style, and options,
+    /// using the default console renderer.
+    /// </summary>
+    /// <param name="title">The menu title.</param>
+    /// <param name="style">The visual style used to render the menu.</param>
+    /// <param name="options">The selectable options.</param>
+    public Menu(string title, MenuStyle style, params string[] options)
+        : this(title, ConsoleRenderer.Instance, style, options) { }
+
+    /// <inheritdoc />
+    protected override bool SupportsRendererSwap => true;
+
+    /// <inheritdoc/>
+    protected override IRenderer SwapRenderer(IRenderer? incoming)
     {
-        Console.Clear();
-
-        // Display title
-        Console.ForegroundColor = ColorScheme.MenuTitle;
-        ConsoleHelper.WriteCentered(title);
-        Console.ResetColor();
-        ConsoleHelper.WriteEmptyLines(1);
-
-        // Display options
-        for (int i = 0; i < options.Count; i++)
+        IRenderer previous = _renderer;
+        if (incoming is not null)
         {
-            Console.ForegroundColor = ColorScheme.MenuOption;
-            Console.Write($"[{i + 1}]");
-            Console.WriteLine(options[i]);
-            Console.ResetColor();
+            _renderer = incoming;
         }
 
-        ConsoleHelper.WriteEmptyLines(1);
+        return previous;
+    }
 
-        // Get user selection
+    /// <summary>
+    /// Renders the menu using the configured <see cref="Style"/>.
+    /// </summary>
+    public override void Render()
+    {
+        switch (Style)
+        {
+            case MenuStyle.Numbered:
+                RenderNumbered();
+                break;
+            case MenuStyle.Bordered:
+                RenderBordered();
+                break;
+            case MenuStyle.Interactive:
+            default:
+                RenderInteractive(0);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Starts the interaction loop and returns the zero-based index of the
+    /// selected option, or <c>-1</c> if the user pressed Escape.
+    /// </summary>
+    public int Interact() =>
+        Style switch
+        {
+            MenuStyle.Numbered => InteractNumbered(),
+            MenuStyle.Bordered => InteractBordered(),
+            _ => InteractInteractive(),
+        };
+
+    #region Numbered
+    private void RenderNumbered()
+    {
+        ColorScheme colors = this.ActiveTheme.Colors;
+        Console.Clear();
+
+        _renderer.WriteColoredLine(Title, colors.MenuTitle);
+        _renderer.WriteLine();
+
+        for (int i = 0; i < _options.Count; i++)
+        {
+            _renderer.WriteColored($"[{i + 1}] ", colors.Primary);
+            _renderer.WriteColoredLine(_options[i], colors.MenuOption);
+        }
+
+        _renderer.WriteLine();
+    }
+
+    private int InteractNumbered()
+    {
+        RenderNumbered();
+        ColorScheme colors = this.ActiveTheme.Colors;
+
         while (true)
         {
-            Console.ForegroundColor = ColorScheme.Primary;
-            Console.Write("Select an option: ");
-            Console.ResetColor();
-
+            _renderer.WriteColored("Select an option: ", colors.Primary);
             string? input = Console.ReadLine();
 
-            if (int.TryParse(input, out int choice) && choice >= 1 && choice <= options.Count)
+            if (int.TryParse(input, out int choice) && choice >= 1 && choice <= _options.Count)
             {
                 return choice - 1;
             }
 
-            ColorWriter.WriteError("Invalid selection. Please try again.\n");
+            _renderer.WriteColoredLine("Invalid selection. Please try again.\n", colors.Error);
         }
     }
+    #endregion
 
-    public static int DisplayInteractive(string title, params string[] options) =>
-        DisplayInteractive(title, options.ToList());
+    #region Interactive
+    private void RenderInteractive(int selectedIndex)
+    {
+        ColorScheme colors = this.ActiveTheme.Colors;
 
-    private static int DisplayInteractive(string title, List<string> options)
+        Console.SetCursorPosition(0, 0);
+        _renderer.WriteColoredLine(Title, colors.MenuTitle);
+        _renderer.WriteLine();
+
+        for (int i = 0; i < _options.Count; i++)
+        {
+            if (i == selectedIndex)
+            {
+                _renderer.WriteColored("> ", colors.MenuSelected);
+                _renderer.WriteColoredLine(_options[i], colors.MenuSelected);
+            }
+            else
+            {
+                _renderer.WriteColored("  ", colors.MenuOption);
+                _renderer.WriteColoredLine(_options[i], colors.MenuOption);
+            }
+        }
+
+        _renderer.WriteLine();
+        _renderer.WriteColoredLine("Use up/down arrows to navigate, Enter to select", colors.Muted);
+    }
+
+    private int InteractInteractive()
     {
         Console.Clear();
         ConsoleHelper.HideCursor();
@@ -60,127 +158,102 @@ public static class Menu
 
         do
         {
-            // Display title
-            Console.SetCursorPosition(0, 0);
-            Console.ForegroundColor = ColorScheme.MenuTitle;
-            ConsoleHelper.WriteCentered(title);
-            Console.ResetColor();
-            ConsoleHelper.WriteEmptyLines(1);
-
-            // Display options
-            for (int i = 0; i < options.Count; i++)
-            {
-                Console.Write(string.Empty);
-
-                if (i == selectedIndex)
-                {
-                    // Highlight selected option
-                    Console.ForegroundColor = ColorScheme.MenuSelected;
-                    Console.Write('>');
-                    Console.WriteLine(options[i]);
-                    Console.ResetColor();
-                }
-                else
-                {
-                    Console.ForegroundColor = ColorScheme.MenuOption;
-                    Console.Write(string.Empty);
-                    Console.WriteLine(options[i]);
-                    Console.ResetColor();
-                }
-            }
-
-            ConsoleHelper.WriteEmptyLines(1);
-            Console.ForegroundColor = ColorScheme.Muted;
-            Console.WriteLine("Use ↑/↓ arrows to navigate, Enter to select");
-            Console.ResetColor();
-
-            // Handle input
+            RenderInteractive(selectedIndex);
             key = Console.ReadKey(true).Key;
 
-            switch (key)
+            selectedIndex = key switch
             {
-                case ConsoleKey.UpArrow:
-                    selectedIndex = selectedIndex > 0 ? selectedIndex - 1 : options.Count - 1;
-                    break;
-                case ConsoleKey.DownArrow:
-                    selectedIndex = selectedIndex < options.Count - 1 ? selectedIndex + 1 : 0;
-                    break;
-            }
+                ConsoleKey.UpArrow => selectedIndex > 0 ? selectedIndex - 1 : _options.Count - 1,
+                ConsoleKey.DownArrow => selectedIndex < _options.Count - 1 ? selectedIndex + 1 : 0,
+                _ => selectedIndex,
+            };
         } while (key != ConsoleKey.Enter);
 
         ConsoleHelper.ShowCursor();
         return selectedIndex;
     }
 
-    // Bordered menu with custom styling
-    public static int DisplayBordered(string title, params string[] options) =>
-        DisplayBordered(title, options.ToList());
+    #endregion
 
-    private static int DisplayBordered(string title, List<string> options)
+    #region Bordered
+    private void RenderBordered(int selectedIndex = -1)
     {
-        Console.Clear();
+        ColorScheme colors = this.ActiveTheme.Colors;
+        BorderStyle border = this.ActiveTheme.Border;
 
-        // Calculate dimensions
-        int maxWidth = Math.Max(title.Length, options.Max(o => o.Length)) + 8;
+        int maxWidth = Math.Max(Title.Length, _options.Max(o => o.Length)) + 8;
         int menuWidth = Math.Min(maxWidth, Console.WindowWidth - 4);
 
         // Top border
-        Console.ForegroundColor = ColorScheme.MenuBorder;
-        Console.WriteLine(
-            $"{BorderStyle.TopLeft}{new string(BorderStyle.Horizontal, menuWidth)}{BorderStyle.TopRight}"
-        );
+        _renderer.WriteColored(border.TopLeft.ToString(), colors.MenuBorder);
+        _renderer.WriteColored(new string(border.Horizontal, menuWidth), colors.MenuBorder);
+        _renderer.WriteColoredLine(border.TopRight.ToString(), colors.MenuBorder);
 
-        // Title
-        Console.Write(BorderStyle.Vertical);
-        Console.ForegroundColor = ColorScheme.MenuTitle;
-        Console.Write(ConsoleHelper.PadCenter(title, menuWidth - 2));
-        Console.ForegroundColor = ColorScheme.MenuBorder;
-        Console.WriteLine(BorderStyle.Vertical);
+        // Title row
+        _renderer.WriteColored(border.Vertical.ToString(), colors.MenuBorder);
+        _renderer.WriteColored(ConsoleHelper.PadCenter(Title, menuWidth), colors.MenuTitle);
+        _renderer.WriteColoredLine(border.Vertical.ToString(), colors.MenuBorder);
 
-        // Separator
-        Console.WriteLine(
-            $"{BorderStyle.TeeLeft}{new string(BorderStyle.Horizontal, menuWidth)}{BorderStyle.TeeRight}"
-        );
+        // Title separator
+        _renderer.WriteColored(border.TeeLeft.ToString(), colors.MenuBorder);
+        _renderer.WriteColored(new string(border.Horizontal, menuWidth), colors.MenuBorder);
+        _renderer.WriteColoredLine(border.TeeRight.ToString(), colors.MenuBorder);
 
         // Options
-        for (int i = 0; i < options.Count; i++)
+        for (int i = 0; i < _options.Count; i++)
         {
-            Console.ForegroundColor = ColorScheme.MenuBorder;
-            Console.Write(BorderStyle.Vertical);
-            Console.ForegroundColor = ColorScheme.MenuOption;
-            Console.Write($"[{i + 1}] {options[i]}");
+            string label = $"[{i + 1}] {_options[i]}";
+            int padding = menuWidth - 2 - label.Length;
 
-            // Pad to menu width
-            int padding = menuWidth - 2 - ($"[{i + 1}] {options[i]}".Length);
-            Console.Write(new string(' ', Math.Max(0, padding)));
+            _renderer.WriteColored(border.Vertical.ToString(), colors.MenuBorder);
 
-            Console.ForegroundColor = ColorScheme.MenuBorder;
-            Console.WriteLine(BorderStyle.Vertical);
+            ConsoleColor optionColor = i == selectedIndex ? colors.MenuSelected : colors.MenuOption;
+
+            _renderer.WriteColored($" {label} ", optionColor);
+            _renderer.WriteColored(new string(' ', Math.Max(0, padding)), optionColor);
+            _renderer.WriteColoredLine(border.Vertical.ToString(), colors.MenuBorder);
         }
 
         // Bottom border
-        Console.WriteLine(
-            $"{BorderStyle.BottomLeft}{new string(BorderStyle.Horizontal, menuWidth)}{BorderStyle.BottomRight}"
-        );
-        Console.ResetColor();
+        _renderer.WriteColored(border.BottomLeft.ToString(), colors.MenuBorder);
+        _renderer.WriteColored(new string(border.Horizontal, menuWidth), colors.MenuBorder);
+        _renderer.WriteColoredLine(border.BottomRight.ToString(), colors.MenuBorder);
+    }
 
-        ConsoleHelper.WriteEmptyLines(1);
+    private int InteractBordered()
+    {
+        Console.Clear();
+        RenderBordered();
+        _renderer.WriteLine();
 
-        // Get selection
+        ColorScheme colors = this.ActiveTheme.Colors;
+
         while (true)
         {
-            Console.ForegroundColor = ColorScheme.Primary;
-            Console.Write("Select an option: ");
-            Console.ResetColor();
-
+            _renderer.WriteColored("Select an option: ", colors.Primary);
             string? input = Console.ReadLine();
 
-            if (int.TryParse(input, out int choice) && choice >= 1 && choice <= options.Count)
+            if (int.TryParse(input, out int choice) && choice >= 1 && choice <= _options.Count)
             {
                 return choice - 1;
             }
 
-            ColorWriter.WriteError("Invalid selection. Please try again.\n");
+            _renderer.WriteColoredLine("Invalid selection. Please try again.\n", colors.Error);
         }
     }
+
+    #endregion
+}
+
+/// <summary>Specifies the visual style used to render a <see cref="Menu"/>.</summary>
+public enum MenuStyle
+{
+    /// <summary>A numbered list with keyboard input selection.</summary>
+    Numbered,
+
+    /// <summary>An arrow-key navigable list with live highlight.</summary>
+    Interactive,
+
+    /// <summary>A numbered list enclosed in a border box.</summary>
+    Bordered,
 }

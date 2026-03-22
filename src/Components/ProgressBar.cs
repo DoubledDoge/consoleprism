@@ -1,64 +1,81 @@
-﻿namespace ConsolePrism.Components;
+﻿using ConsolePrism.Core;
+using ConsolePrism.Core.Renderers;
 
+namespace ConsolePrism.Components;
+
+using Interfaces;
 using Themes;
 
-public static class ProgressBar
+/// <summary>
+/// A UI component that renders a visual progress bar to the console.
+/// </summary>
+/// <param name="renderer">The renderer to write output to.</param>
+/// <param name="current">The current progress label.</param>
+/// <param name="label">The optional label.</param>
+/// <param name="total">The optional max progress value.</param>
+public sealed class ProgressBar(IRenderer renderer, int current, string? label, int total = 100)
+    : ComponentBase
 {
-    private static void Display(int current, int total, int barWidth = 40, string? label = null)
+    private string? Label { get; } = label;
+    private int Total { get; } = total;
+
+    /// <summary>Gets or sets the current progress value of the bar.</summary>
+    public int Current { get; set; } = current;
+
+    /// <summary>Gets or sets the width of the bar in characters.</summary>
+    public int BarWidth { get; set; } = 40;
+
+    /// <summary>
+    /// Gets or sets whether the bar updates in place, overwriting the current
+    /// console line rather than advancing to a new one.
+    /// </summary>
+    public bool InPlace { get; set; } = false;
+
+    /// <summary>
+    /// Initializes a new <see cref="ProgressBar"/> using the default console renderer.
+    /// </summary>
+    /// <param name="current">The current progress label.</param>
+    /// <param name="label">The optional label.</param>
+    /// <param name="total">The optional max progress value.</param>
+    public ProgressBar(int current, string? label, int total)
+        : this(ConsoleRenderer.Instance, current, label, total) { }
+
+    /// <inheritdoc/>
+    public override void Render()
     {
-        if (total <= 0)
-            total = 1; // Prevent division by zero and negative progress bars
+        ColorScheme colors = this.ActiveTheme.Colors;
 
-        if (current > total)
-            current = total; // Limit progress to total
-
-        if (current < 0)
-            current = 0; // Prevent negative progress bars
+        int total = Math.Max(1, Total);
+        int current = Math.Clamp(Current, 0, total);
 
         double percentage = (double)current / total;
-        int filledWidth = (int)(barWidth * percentage);
-        int emptyWidth = barWidth - filledWidth;
+        int filledWidth = (int)(BarWidth * percentage);
+        int emptyWidth = BarWidth - filledWidth;
 
-        // Optional label
-        if (!string.IsNullOrEmpty(label))
+        int startLeft = Console.CursorLeft;
+        int startTop = Console.CursorTop;
+
+        if (!string.IsNullOrEmpty(Label))
         {
-            Console.ForegroundColor = ColorScheme.ProgressBarText;
-            Console.Write($"{label}: ");
-            Console.ResetColor();
+            renderer.WriteColored($"{Label}: ", colors.ProgressBarText);
         }
 
-        Console.Write("[");
-
-        // Filled portion
-        Console.ForegroundColor = ColorScheme.ProgressBarComplete;
-        Console.Write(new string('█', filledWidth));
-        Console.ResetColor();
-
-        // Empty portion
-        Console.ForegroundColor = ColorScheme.ProgressBarIncomplete;
-        Console.Write(new string('░', emptyWidth));
-        Console.ResetColor();
-
-        // Closing bracket and percentage
-        Console.ForegroundColor = ColorScheme.ProgressBarText;
-        Console.Write($"] {percentage:P0}");
-        Console.ResetColor();
-    }
-
-    // For animations
-    public static void DisplayInPlace(
-        int current,
-        int total,
-        int barWidth = 40,
-        string? label = null
-    )
-    {
-        int startPosition = Console.CursorLeft;
-        int linePosition = Console.CursorTop;
-
-        Display(current, total, barWidth, label);
-
-        // Return the cursor to start for the next update
-        Console.SetCursorPosition(startPosition, linePosition);
+        renderer.Write("[");
+        renderer.WriteColored(new string('█', filledWidth), colors.ProgressBarComplete);
+        renderer.WriteColored(new string('░', emptyWidth), colors.ProgressBarIncomplete);
+        renderer.WriteColored($"] {percentage:P0}", colors.ProgressBarText);
+        if (InPlace)
+        {
+            ConsoleHelper.HideCursor();
+            renderer.SetCursorPosition(startLeft, startTop);
+            if (current >= total)
+            {
+                ConsoleHelper.ShowCursor();
+            }
+        }
+        else
+        {
+            renderer.WriteLine();
+        }
     }
 }

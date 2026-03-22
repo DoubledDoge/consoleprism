@@ -1,63 +1,91 @@
-﻿namespace ConsolePrism.Components;
+﻿using ConsolePrism.Core.Renderers;
 
-using Core;
+namespace ConsolePrism.Components;
+
+using Interfaces;
 using Themes;
 
-public static class Table
+/// <summary>
+/// A UI component that renders a bordered, auto-sizing data table with
+/// text wrapping support.
+/// </summary>
+/// <remarks>
+/// Initialises a new <see cref="Table"/> with an explicit renderer.
+/// </remarks>
+/// <param name="headers">Column header labels.</param>
+/// <param name="data">Cell data, or <see langword="null"/> for a headers-only table.</param>
+/// <param name="renderer">The renderer to write output to.</param>
+/// <param name="columnWidths">Optional explicit column widths.</param>
+public sealed class Table(
+    string[] headers,
+    string[,]? data,
+    IRenderer renderer,
+    int[]? columnWidths = null
+) : ComponentBase
 {
-    // Main display method
-    public static void Display(string[] headers, string[,]? data, int[]? columnWidths = null)
+    /// <summary>
+    /// Initializes a new <see cref="Table"/> with the default console renderer.
+    /// </summary>
+    /// <param name="headers">Column header labels.</param>
+    /// <param name="data">
+    /// A two-dimensional array of cell values, where the first dimension is rows
+    /// and the second is columns. May be <see langword="null"/> to render headers only.
+    /// </param>
+    /// <param name="columnWidths">
+    /// Optional explicit column widths. When <see langword="null"/>, widths are
+    /// calculated automatically from content.
+    /// </param>
+    public Table(string[] headers, string[,]? data, int[]? columnWidths = null)
+        : this(headers, data, ConsoleRenderer.Instance, columnWidths) { }
+
+    /// <inheritdoc/>
+    public override void Render()
     {
         if (headers.Length == 0)
         {
-            ColorWriter.WriteError("Table requires at least one header.\n");
+            renderer.WriteColoredLine(
+                "Table requires at least one header.",
+                this.ActiveTheme.Colors.Error
+            );
             return;
         }
 
-        int rowCount = data?.GetLength(0) ?? 0;
+        int[] widths = columnWidths ?? CalculateColumnWidths();
 
-        // Calculate column widths if not provided
-        int[] widths = columnWidths ?? CalculateColumnWidths(headers, data);
-
-        // Draw table
         DrawTopBorder(widths);
-        DrawHeaderRow(headers, widths);
+        DrawHeaderRow(widths);
         DrawSeparator(widths);
 
-        if (rowCount > 0)
+        if (data is not null && data.GetLength(0) > 0)
         {
-            DrawDataRows(data, widths);
+            DrawDataRows(widths);
         }
 
         DrawBottomBorder(widths);
     }
-    
-    private static int[] CalculateColumnWidths(string[] headers, string[,]? data)
+
+    private int[] CalculateColumnWidths()
     {
         int columnCount = headers.Length;
         int[] widths = new int[columnCount];
 
-        // Start with header widths
         for (int col = 0; col < columnCount; col++)
         {
             widths[col] = headers[col].Length;
         }
 
-        // Check data widths
-        if (data != null)
+        if (data is not null)
         {
             int rowCount = data.GetLength(0);
             for (int row = 0; row < rowCount; row++)
             {
                 for (int col = 0; col < columnCount; col++)
                 {
-                    string cellValue = data[row, col];
-                    widths[col] = Math.Max(widths[col], cellValue.Length);
+                    widths[col] = Math.Max(widths[col], data[row, col].Length);
                 }
             }
         }
 
-        // Add padding
         for (int i = 0; i < widths.Length; i++)
         {
             widths[i] += 2;
@@ -66,144 +94,161 @@ public static class Table
         return widths;
     }
 
-    private static void DrawTopBorder(int[] widths)
+    private void DrawTopBorder(int[] widths)
     {
-        Console.ForegroundColor = ColorScheme.TableBorder;
-        Console.Write(BorderStyle.TopLeft);
+        (ColorScheme colors, BorderStyle border) = (
+            this.ActiveTheme.Colors,
+            this.ActiveTheme.Border
+        );
+
+        renderer.WriteColored(border.TopLeft.ToString(), colors.TableBorder);
 
         for (int i = 0; i < widths.Length; i++)
         {
-            Console.Write(new string(BorderStyle.Horizontal, widths[i]));
+            renderer.WriteColored(new string(border.Horizontal, widths[i]), colors.TableBorder);
             if (i < widths.Length - 1)
-                Console.Write(BorderStyle.TeeTop);
+            {
+                renderer.WriteColored(border.TeeTop.ToString(), colors.TableBorder);
+            }
         }
 
-        Console.WriteLine(BorderStyle.TopRight);
-        Console.ResetColor();
+        renderer.WriteColoredLine(border.TopRight.ToString(), colors.TableBorder);
     }
 
-    private static void DrawHeaderRow(string[] headers, int[] widths)
+    private void DrawSeparator(int[] widths)
     {
-        Console.ForegroundColor = ColorScheme.TableBorder;
-        Console.Write(BorderStyle.Vertical);
+        (ColorScheme colors, BorderStyle border) = (
+            this.ActiveTheme.Colors,
+            this.ActiveTheme.Border
+        );
+
+        renderer.WriteColored(border.TeeLeft.ToString(), colors.TableBorder);
+
+        for (int i = 0; i < widths.Length; i++)
+        {
+            renderer.WriteColored(new string(border.Horizontal, widths[i]), colors.TableBorder);
+            if (i < widths.Length - 1)
+            {
+                renderer.WriteColored(border.Cross.ToString(), colors.TableBorder);
+            }
+        }
+
+        renderer.WriteColoredLine(border.TeeRight.ToString(), colors.TableBorder);
+    }
+
+    private void DrawBottomBorder(int[] widths)
+    {
+        (ColorScheme colors, BorderStyle border) = (
+            this.ActiveTheme.Colors,
+            this.ActiveTheme.Border
+        );
+
+        renderer.WriteColored(border.BottomLeft.ToString(), colors.TableBorder);
+
+        for (int i = 0; i < widths.Length; i++)
+        {
+            renderer.WriteColored(new string(border.Horizontal, widths[i]), colors.TableBorder);
+            if (i < widths.Length - 1)
+            {
+                renderer.WriteColored(border.TeeBottom.ToString(), colors.TableBorder);
+            }
+        }
+
+        renderer.WriteColoredLine(border.BottomRight.ToString(), colors.TableBorder);
+    }
+
+    private void DrawHeaderRow(int[] widths)
+    {
+        (ColorScheme colors, BorderStyle border) = (
+            this.ActiveTheme.Colors,
+            this.ActiveTheme.Border
+        );
+
+        renderer.WriteColored(border.Vertical.ToString(), colors.TableBorder);
 
         for (int i = 0; i < headers.Length; i++)
         {
-            Console.ForegroundColor = ColorScheme.TableHeader;
-            string paddedHeader = PadCell(headers[i], widths[i]);
-            Console.Write(paddedHeader);
-
-            Console.ForegroundColor = ColorScheme.TableBorder;
-            Console.Write(BorderStyle.Vertical);
+            renderer.WriteColored(PadCell(headers[i], widths[i]), colors.TableHeader);
+            renderer.WriteColored(border.Vertical.ToString(), colors.TableBorder);
         }
 
-        Console.WriteLine();
-        Console.ResetColor();
+        renderer.WriteLine();
     }
 
-    private static void DrawSeparator(int[] widths)
+    private void DrawDataRows(int[] widths)
     {
-        Console.ForegroundColor = ColorScheme.TableBorder;
-        Console.Write(BorderStyle.TeeLeft);
-
-        for (int i = 0; i < widths.Length; i++)
-        {
-            Console.Write(new string(BorderStyle.Horizontal, widths[i]));
-            if (i < widths.Length - 1)
-                Console.Write(BorderStyle.Cross);
-        }
-
-        Console.WriteLine(BorderStyle.TeeRight);
-        Console.ResetColor();
-    }
-
-    private static void DrawDataRows(string[,]? data, int[] widths)
-    {
-        if (data == null)
-            return;
-        int rowCount = data.GetLength(0);
+        (ColorScheme colors, BorderStyle border) = (
+            this.ActiveTheme.Colors,
+            this.ActiveTheme.Border
+        );
+        int rowCount = data!.GetLength(0);
         int columnCount = data.GetLength(1);
 
         for (int row = 0; row < rowCount; row++)
         {
-            List<string[]> wrappedRows = WrapRow(data, row, widths);
+            List<string[]> wrappedRows = WrapRow(row, widths);
 
-            // Draw each wrapped line
             foreach (string[] wrappedLine in wrappedRows)
             {
-                Console.ForegroundColor = ColorScheme.TableBorder;
-                Console.Write(BorderStyle.Vertical);
+                renderer.WriteColored(border.Vertical.ToString(), colors.TableBorder);
 
                 for (int col = 0; col < columnCount; col++)
                 {
-                    Console.ForegroundColor = ColorScheme.TableData;
-                    string cellContent = col < wrappedLine.Length ? wrappedLine[col] : "";
-                    Console.Write(PadCell(cellContent, widths[col]));
-
-                    Console.ForegroundColor = ColorScheme.TableBorder;
-                    Console.Write(BorderStyle.Vertical);
+                    string cell = col < wrappedLine.Length ? wrappedLine[col] : string.Empty;
+                    renderer.WriteColored(PadCell(cell, widths[col]), colors.TableData);
+                    renderer.WriteColored(border.Vertical.ToString(), colors.TableBorder);
                 }
 
-                Console.WriteLine();
-                Console.ResetColor();
+                renderer.WriteLine();
             }
         }
     }
-    
-    private static List<string[]> WrapRow(string[,] data, int row, int[] widths)
-    {
-        int columnCount = data.GetLength(1);
-        List<string[]> wrappedLines = [];
 
-        // Split each cell into lines based on column width
+    private List<string[]> WrapRow(int row, int[] widths)
+    {
+        int columnCount = data!.GetLength(1);
         List<string>[] cellLines = new List<string>[columnCount];
         int maxLines = 1;
 
         for (int col = 0; col < columnCount; col++)
         {
-            string cellValue = data[row, col];
-            int maxWidth = widths[col] - 2; // Remove padding space
-
-            cellLines[col] = WrapText(cellValue, maxWidth);
+            cellLines[col] = WrapText(data[row, col], widths[col] - 2);
             maxLines = Math.Max(maxLines, cellLines[col].Count);
         }
 
-        // Create wrapped rows
+        List<string[]> wrappedRows = [];
+
         for (int line = 0; line < maxLines; line++)
         {
             string[] wrappedLine = new string[columnCount];
             for (int col = 0; col < columnCount; col++)
             {
-                wrappedLine[col] = line < cellLines[col].Count ? cellLines[col][line] : "";
+                wrappedLine[col] =
+                    line < cellLines[col].Count ? cellLines[col][line] : string.Empty;
             }
-            wrappedLines.Add(wrappedLine);
+
+            wrappedRows.Add(wrappedLine);
         }
 
-        return wrappedLines;
+        return wrappedRows;
     }
 
-    // Wrap text to fit within a specified width
     private static List<string> WrapText(string text, int maxWidth)
     {
-        List<string> lines = [];
-
         if (string.IsNullOrEmpty(text))
         {
-            lines.Add("");
-            return lines;
+            return [""];
         }
 
         if (text.Length <= maxWidth)
         {
-            lines.Add(text);
-            return lines;
+            return [text];
         }
 
-        // Split by spaces and wrap
-        string[] words = text.Split(' ');
-        string currentLine = "";
+        List<string> lines = new List<string>();
+        string currentLine = string.Empty;
 
-        foreach (string word in words)
+        foreach (string word in text.Split(' '))
         {
             if (string.IsNullOrEmpty(currentLine))
             {
@@ -228,31 +273,9 @@ public static class Table
         return lines;
     }
 
-    private static void DrawBottomBorder(int[] widths)
-    {
-        Console.ForegroundColor = ColorScheme.TableBorder;
-        Console.Write(BorderStyle.BottomLeft);
-
-        for (int i = 0; i < widths.Length; i++)
-        {
-            Console.Write(new string(BorderStyle.Horizontal, widths[i]));
-            
-            if (i < widths.Length - 1)
-                Console.Write(BorderStyle.TeeBottom);
-        }
-
-        Console.WriteLine(BorderStyle.BottomRight);
-        Console.ResetColor();
-    }
-    
     private static string PadCell(string? content, int width)
     {
-        content ??= "";
-
-        if (content.Length >= width)
-            return content[..width];
-
-        // Align to left if content is shorter than the column width
-        return " " + content.PadRight(width - 1);
+        content ??= string.Empty;
+        return content.Length >= width ? content[..width] : " " + content.PadRight(width - 1);
     }
 }
