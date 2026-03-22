@@ -5,7 +5,7 @@
     <Platform Name="x86" />
   </Configurations>
 
-  <Folder Name="/Typeguard/">
+  <Folder Name="/ConsolePrism/">
     <File Path=".gitignore" />
     <File Path=".gitattributes" />
     <File Path=".editorconfig" />
