@@ -9,20 +9,18 @@ using Interfaces;
 /// components stacked top to bottom, with optional spacing between them.
 /// </summary>
 /// <param name="renderer">The renderer to write output to.</param>
-public sealed class Row(IRenderer renderer) : ComponentBase
+/// <param name="spacing">The number of blank lines inserted between each child component.</param>
+public sealed class Row(IRenderer renderer, int spacing = 0) : ComponentBase
 {
     private readonly List<IRenderable> _children = [];
+    private int Spacing { get; } = spacing;
 
     /// <summary>
-    /// Gets or sets the number of blank lines inserted between each child component.
+    /// Initializes a new <see cref="Row"/> using the default console renderer.
     /// </summary>
-    public int Spacing { get; set; } = 0;
-
-    /// <summary>
-    /// Initialises a new <see cref="Row"/> using the default console renderer.
-    /// </summary>
-    public Row()
-        : this(ConsoleRenderer.Instance) { }
+    /// <param name="spacing">The number of blank lines inserted between each child component.</param>
+    public Row(int spacing = 0)
+        : this(ConsoleRenderer.Instance, spacing) { }
 
     /// <summary>
     /// Adds a child component to this row.

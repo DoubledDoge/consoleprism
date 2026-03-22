@@ -22,19 +22,11 @@ public sealed class Panel(
     int verticalPadding = 0
 ) : ComponentBase
 {
-    /// <summary>
-    /// Gets or sets the inner padding (in characters) on the left and right
-    /// sides of the panel content.
-    /// </summary>
-    public int HorizontalPadding { get; set; } = horizontalPadding;
+    private int HorizontalPadding { get; } = horizontalPadding;
+    private int VerticalPadding { get; } = verticalPadding;
 
     /// <summary>
-    /// Gets or sets the inner padding (in lines) above and below the panel content.
-    /// </summary>
-    public int VerticalPadding { get; set; } = verticalPadding;
-
-    /// <summary>
-    /// Initialises a new <see cref="Panel"/> using the default console renderer.
+    /// Initializes a new <see cref="Panel"/> using the default console renderer.
     /// </summary>s
     /// <param name="title">The title displayed in the panel's top border.</param>
     /// <param name="content">The content to render inside the panel.</param>

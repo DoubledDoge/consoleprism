@@ -14,21 +14,19 @@ using Interfaces;
 /// This means child components do not need to be aware of column layout at all.
 /// </remarks>
 /// <param name="renderer">The renderer to write output to.</param>
-public sealed class Column(IRenderer renderer) : ComponentBase
+/// <param name="gap">The number of space characters inserted between columns.</param>
+public sealed class Column(IRenderer renderer, int gap) : ComponentBase
 {
     private readonly List<IRenderable> _children = [];
     private readonly List<StringRenderer> _bufferRenderers = [];
-
-    /// <summary>
-    /// Gets or sets the number of space characters inserted between columns.
-    /// </summary>
-    public int Gap { get; set; } = 1;
+    private int Gap { get; } = gap;
 
     /// <summary>
     /// Initializes a new <see cref="Column"/> using the default console renderer.
     /// </summary>
-    public Column()
-        : this(ConsoleRenderer.Instance) { }
+    /// <param name="gap">The number of space characters inserted between columns.</param>
+    public Column(int gap)
+        : this(ConsoleRenderer.Instance, gap) { }
 
     /// <summary>
     /// Adds a child component to this column layout.

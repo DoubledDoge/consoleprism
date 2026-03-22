@@ -10,14 +10,11 @@ using Interfaces;
 /// <see cref="ScrollUp"/> and <see cref="ScrollDown"/>.
 /// </summary>
 /// <param name="renderer">The renderer to write output to.</param>
-public sealed class Viewport(IRenderer renderer) : ComponentBase
+/// <param name="height">The number of visible lines in the viewport.</param>
+public sealed class Viewport(IRenderer renderer, int height = 20) : ComponentBase
 {
     private readonly List<IRenderable> _children = [];
-
-    /// <summary>
-    /// Gets or sets the number of visible lines in the viewport.
-    /// </summary>
-    public int Height { get; set; } = 20;
+    private int Height { get; } = height;
 
     /// <summary>
     /// Gets the current scroll offset (zero-based line index of the top visible line).
@@ -25,10 +22,11 @@ public sealed class Viewport(IRenderer renderer) : ComponentBase
     public int ScrollOffset { get; private set; }
 
     /// <summary>
-    /// Initialises a new <see cref="Viewport"/> using the default console renderer.
+    /// Initializes a new <see cref="Viewport"/> using the default console renderer.
     /// </summary>
-    public Viewport()
-        : this(ConsoleRenderer.Instance) { }
+    /// <param name="height">The number of visible lines in the viewport.</param>
+    public Viewport(int height = 20)
+        : this(ConsoleRenderer.Instance, height) { }
 
     /// <summary>Adds a child component to the viewport's content.</summary>
     /// <param name="child">The component to add.</param>
