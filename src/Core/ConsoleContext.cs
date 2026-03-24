@@ -18,30 +18,30 @@ using Themes;
 /// </remarks>
 public sealed class ConsoleContext : IDisposable
 {
-    private readonly Theme _previous;
-    private bool _disposed;
+	private readonly Theme _previous;
+	private bool _disposed;
 
-    /// <summary>
-    /// Initialises a new console context, immediately applying the given theme.
-    /// </summary>
-    /// <param name="theme">The theme to apply for the duration of this context.</param>
-    public ConsoleContext(Theme theme)
-    {
-        _previous = Theme.Current;
-        Theme.Apply(theme);
-    }
+	/// <summary>
+	/// Initialises a new console context, immediately applying the given theme.
+	/// </summary>
+	/// <param name="theme">The theme to apply for the duration of this context.</param>
+	public ConsoleContext(Theme theme)
+	{
+		_previous = Theme.Current;
+		Theme.Apply(theme);
+	}
 
-    /// <summary>
-    /// Restores the theme that was active before this context was created.
-    /// </summary>
-    public void Dispose()
-    {
-        if (_disposed)
-        {
-            return;
-        }
+	/// <summary>
+	/// Restores the theme that was active before this context was created.
+	/// </summary>
+	public void Dispose()
+	{
+		if (_disposed)
+		{
+			return;
+		}
 
-        Theme.Apply(_previous);
-        _disposed = true;
-    }
+		Theme.Apply(_previous);
+		_disposed = true;
+	}
 }

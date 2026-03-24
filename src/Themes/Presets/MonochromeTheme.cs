@@ -6,33 +6,33 @@ namespace ConsolePrism.Themes.Presets;
 /// </summary>
 public static class MonochromeTheme
 {
-    /// <summary>Gets the monochrome theme instance.</summary>
-    public static readonly Theme Instance = new()
-    {
-        Colors = new ColorScheme
-        {
-            Error = ConsoleColor.White,
-            Success = ConsoleColor.White,
-            Warning = ConsoleColor.Gray,
-            Info = ConsoleColor.Gray,
-            Highlight = ConsoleColor.White,
+	/// <summary>Gets the monochrome theme instance.</summary>
+	public static readonly Theme Instance = new()
+	{
+		Colors = new ColorScheme
+		{
+			Error = ConsoleColor.White,
+			Success = ConsoleColor.White,
+			Warning = ConsoleColor.Gray,
+			Info = ConsoleColor.Gray,
+			Highlight = ConsoleColor.White,
 
-            Primary = ConsoleColor.White,
-            Muted = ConsoleColor.DarkGray,
+			Primary = ConsoleColor.White,
+			Muted = ConsoleColor.DarkGray,
 
-            MenuTitle = ConsoleColor.White,
-            MenuOption = ConsoleColor.Gray,
-            MenuSelected = ConsoleColor.White,
-            MenuBorder = ConsoleColor.DarkGray,
+			MenuTitle = ConsoleColor.White,
+			MenuOption = ConsoleColor.Gray,
+			MenuSelected = ConsoleColor.White,
+			MenuBorder = ConsoleColor.DarkGray,
 
-            TableHeader = ConsoleColor.White,
-            TableBorder = ConsoleColor.DarkGray,
-            TableData = ConsoleColor.Gray,
+			TableHeader = ConsoleColor.White,
+			TableBorder = ConsoleColor.DarkGray,
+			TableData = ConsoleColor.Gray,
 
-            ProgressBarComplete = ConsoleColor.White,
-            ProgressBarIncomplete = ConsoleColor.DarkGray,
-            ProgressBarText = ConsoleColor.Gray,
-        },
-        Border = BorderStyle.Single,
-    };
+			ProgressBarComplete = ConsoleColor.White,
+			ProgressBarIncomplete = ConsoleColor.DarkGray,
+			ProgressBarText = ConsoleColor.Gray,
+		},
+		Border = BorderStyle.Single,
+	};
 }

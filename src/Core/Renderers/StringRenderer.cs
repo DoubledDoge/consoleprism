@@ -15,34 +15,34 @@ using Interfaces;
 /// </remarks>
 public sealed class StringRenderer : IRenderer
 {
-    private readonly StringBuilder _buffer = new();
+	private readonly StringBuilder _buffer = new();
 
-    /// <summary>
-    /// Gets the full captured output as a single string.
-    /// </summary>
-    public string Output => _buffer.ToString();
+	/// <summary>
+	/// Gets the full captured output as a single string.
+	/// </summary>
+	public string Output => _buffer.ToString();
 
-    /// <summary>Clears the captured output buffer.</summary>
-    public void Reset() => _buffer.Clear();
+	/// <summary>Clears the captured output buffer.</summary>
+	public void Reset() => _buffer.Clear();
 
-    /// <inheritdoc/>
-    public void Write(string text) => _buffer.Append(text);
+	/// <inheritdoc/>
+	public void Write(string text) => _buffer.Append(text);
 
-    /// <inheritdoc/>
-    public void WriteLine(string text) => _buffer.AppendLine(text);
+	/// <inheritdoc/>
+	public void WriteLine(string text) => _buffer.AppendLine(text);
 
-    /// <inheritdoc/>
-    public void WriteLine() => _buffer.AppendLine();
+	/// <inheritdoc/>
+	public void WriteLine() => _buffer.AppendLine();
 
-    /// <inheritdoc/>
-    public void WriteColored(string text, ConsoleColor color) => _buffer.Append(text);
+	/// <inheritdoc/>
+	public void WriteColored(string text, ConsoleColor color) => _buffer.Append(text);
 
-    /// <inheritdoc/>
-    public void WriteColoredLine(string text, ConsoleColor color) => _buffer.AppendLine(text);
+	/// <inheritdoc/>
+	public void WriteColoredLine(string text, ConsoleColor color) => _buffer.AppendLine(text);
 
-    /// <inheritdoc/>
-    public void SetCursorPosition(int x, int y) { }
+	/// <inheritdoc/>
+	public void SetCursorPosition(int x, int y) { }
 
-    /// <inheritdoc/>
-    public void Clear() => _buffer.Clear();
+	/// <inheritdoc/>
+	public void Clear() => _buffer.Clear();
 }

@@ -8,9 +8,9 @@ namespace ConsolePrism.Interfaces;
 /// </summary>
 public interface IComponent : IRenderable
 {
-    /// <summary>
-    /// Gets or sets an optional theme override for this component.
-    /// When null, the component uses <see cref="Theme.Current"/>.
-    /// </summary>
-    Theme? Theme { get; set; }
+	/// <summary>
+	/// Gets or sets an optional theme override for this component.
+	/// When null, the component uses <see cref="Theme.Current"/>.
+	/// </summary>
+	Theme? Theme { get; set; }
 }

@@ -1,38 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
-    <LangVersion>latest</LangVersion>
-    <PlatformTarget>AnyCpu</PlatformTarget>
-    <OutputType>Library</OutputType>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Optimize>true</Optimize>
-    <Deterministic>true</Deterministic>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <AnalysisLevel>latest</AnalysisLevel>
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+		<LangVersion>latest</LangVersion>
+		<PlatformTarget>AnyCpu</PlatformTarget>
+		<OutputType>Library</OutputType>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Optimize>true</Optimize>
+		<Deterministic>true</Deterministic>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<AnalysisLevel>latest</AnalysisLevel>
+		<AnalysisMode>All</AnalysisMode>
+		<CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <PackageId>ConsolePrism</PackageId>
-    <Version>1.0.0</Version>
-    <Authors>DoubledDoge</Authors>
-    <Description>Another opinionated console UI framework for .NET applications.</Description>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/DoubledDoge/consoleprism</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/DoubledDoge/consoleprism/</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>console;cli;terminal;ui;</PackageTags>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>See https://github.com/DoubledDoge/consoleprism/releases for release notes.</PackageReleaseNotes>
-  </PropertyGroup>
+	<PropertyGroup>
+		<PackageId>ConsolePrism</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>DoubledDoge</Authors>
+		<Description>Another opinionated console UI framework for .NET applications.</Description>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/DoubledDoge/consoleprism</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/DoubledDoge/consoleprism/</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>console;cli;terminal;ui;</PackageTags>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReleaseNotes>See https://github.com/DoubledDoge/consoleprism/releases for release notes.</PackageReleaseNotes>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="../README.md" Pack="true" PackagePath="/" />
-    <None Include="../icon.png" Pack="true" PackagePath="/" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="../README.md" Pack="true" PackagePath="/" />
+		<None Include="../icon.png" Pack="true" PackagePath="/" />
+	</ItemGroup>
 </Project>

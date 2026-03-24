@@ -99,11 +99,11 @@ int mode = bordered.Interact();
 using ConsolePrism.Components;
 
 string[] headers = ["Name", "Score", "Level"];
-string[,] data = {
-    { "Alice", "1250", "10" },
-    { "Bob",   "980",  "8"  },
-    { "Charlie","1500","12" }
-}; // Can be nullable for empty cells
+string[][] data = [
+    ["Alice",   "1250", "10"],
+    ["Bob",     "980",  "8" ],
+    ["Charlie", "1500", "12"],
+]; // Can be nullable for empty cells
 
 new Table(headers, data).Render();
 
