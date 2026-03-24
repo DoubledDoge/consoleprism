@@ -48,10 +48,10 @@ public sealed class ProgressBar(
 	{
 		ColorScheme colors = ActiveTheme.Colors;
 
-		int total = Math.Max(1, Total);
-		int current = Math.Clamp(Current, 0, total);
+		int renderTotal = Math.Max(1, Total);
+		int renderCurrent = Math.Clamp(Current, 0, renderTotal);
 
-		double percentage = (double)current / total;
+		double percentage = (double)renderCurrent / renderTotal;
 		int filledWidth = (int)(BarWidth * percentage);
 		int emptyWidth = BarWidth - filledWidth;
 
@@ -71,7 +71,7 @@ public sealed class ProgressBar(
 		{
 			ConsoleHelper.HideCursor();
 			renderer.SetCursorPosition(startLeft, startTop);
-			if (current >= total)
+			if (renderCurrent >= renderTotal)
 			{
 				ConsoleHelper.ShowCursor();
 			}

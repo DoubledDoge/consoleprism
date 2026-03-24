@@ -64,6 +64,7 @@ public sealed class Menu(
 				RenderBordered();
 				break;
 			case MenuStyle.Interactive:
+				break;
 			default:
 				RenderInteractive(0);
 				break;
