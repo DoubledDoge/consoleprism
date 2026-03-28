@@ -152,18 +152,15 @@ await ConnectAsync();
 ```csharp
 using ConsolePrism.Components;
 
-new Notification("File saved!", NotificationLevel.Success).Render();
-new Notification("Low disk space.", NotificationLevel.Warning).Render();
-new Notification("Connection failed.", NotificationLevel.Error).Render();
+new Notification("File saved!", false, NotificationLevel.Success).Render();
+new Notification("Low disk space.", false, NotificationLevel.Warning).Render();
+new Notification("Connection failed.", false NotificationLevel.Error).Render();
 
 // Transient notification
-new Notification("Autosaving...", NotificationLevel.Info, 2000).Render();
+new Notification("Autosaving...", false, NotificationLevel.Info, 2000).Render();
 
 // Bordered notification
-new Notification("Welcome to ConsolePrism!", NotificationLevel.Info)
-{
-    Bordered = true
-}.Render();
+new Notification("Welcome to ConsolePrism!", true, NotificationLevel.Info).Render();
 ```
 
 ### Console Utilities
