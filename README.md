@@ -163,15 +163,15 @@ new Notification("Autosaving...", false, NotificationLevel.Info, 2000).Render();
 new Notification("Welcome to ConsolePrism!", true, NotificationLevel.Info).Render();
 ```
 
-### Text
+### Console Text
 ```csharp
 using ConsolePrism.Components;
 
 // Simple text
-new Text("This is a simple text component.").Render();
+new ConsoleText("This is a simple text component.").Render();
 
 // Text with colour
-new Text("This is an error message.", ConsoleColor.Red).Render();
+new ConsoleText("This is an error message.", ConsoleColor.Red).Render();
 
 // Note: This has been implemented with the sole purpose of for ease of use in the panel, column, row and viewport layouts.
 ```
@@ -181,13 +181,13 @@ new Text("This is an error message.", ConsoleColor.Red).Render();
 using ConsolePrism.Layout;
 
 Panel simplePanel = new(
-	content: new Text("This is a simple panel.")
+	content: new ConsoleText("This is a simple panel.") // Or any component
 );
 
 // Complex panel with title, content, and padding
 Panel panel = new(
     title: "Welcome",
-    content: new Text("Hello, World!"),
+    content: new ConsoleText("Hello, World!"),
     horizontalPadding: 2,
     verticalPadding: 1
 );
@@ -200,9 +200,9 @@ panel.Render();
 using ConsolePrism.Layout;
 
 Row layout = new Row(spacing: 1)  // 1 blank line between each component
-    .Add(new Text("Header"))
+    .Add(new ConsoleText("Header"))
     .Add(new Panel(title: "Info", content: new Text("Details...")))
-    .Add(new Text("Footer"));
+    .Add(new ConsoleText("Footer"));
 
 layout.Render();
 ```
@@ -212,10 +212,10 @@ layout.Render();
 using ConsolePrism.Layout;
 
 Viewport viewport = new Viewport(height: 10)  // Show 10 lines at a time
-    .Add(new Text("Line 1"))
-    .Add(new Text("Line 2"))
+    .Add(new ConsoleText("Line 1"))
+    .Add(new ConsoleText("Line 2"))
     // ... 50 more lines of content (Unfortunately you'll have to write them all out individually.)
-    .Add(new Text("Line 52"));
+    .Add(new ConsoleText("Line 52"));
 
 viewport.Render();  // Initially shows lines 1-10
 
