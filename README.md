@@ -163,6 +163,85 @@ new Notification("Autosaving...", false, NotificationLevel.Info, 2000).Render();
 new Notification("Welcome to ConsolePrism!", true, NotificationLevel.Info).Render();
 ```
 
+### Text
+```csharp
+using ConsolePrism.Components;
+
+// Simple text
+new Text("This is a simple text component.").Render();
+
+// Text with colour
+new Text("This is an error message.", ConsoleColor.Red).Render();
+
+// Note: This has been implemented with the sole purpose of for ease of use in the panel, column, row and viewport layouts.
+```
+
+### Panels
+```csharp
+using ConsolePrism.Layout;
+
+Panel simplePanel = new(
+	content: new Text("This is a simple panel.")
+);
+
+// Complex panel with title, content, and padding
+Panel panel = new(
+    title: "Welcome",
+    content: new Text("Hello, World!"),
+    horizontalPadding: 2,
+    verticalPadding: 1
+);
+
+panel.Render();
+```
+
+### Rows
+```csharp
+using ConsolePrism.Layout;
+
+Row layout = new Row(spacing: 1)  // 1 blank line between each component
+    .Add(new Text("Header"))
+    .Add(new Panel(title: "Info", content: new Text("Details...")))
+    .Add(new Text("Footer"));
+
+layout.Render();
+```
+
+### Viewport
+```csharp
+using ConsolePrism.Layout;
+
+Viewport viewport = new Viewport(height: 10)  // Show 10 lines at a time
+    .Add(new Text("Line 1"))
+    .Add(new Text("Line 2"))
+    // ... 50 more lines of content (Unfortunately you'll have to write them all out individually.)
+    .Add(new Text("Line 52"));
+
+viewport.Render();  // Initially shows lines 1-10
+
+// User can scroll
+viewport.ScrollDown(3);  // Now shows lines 4-13
+viewport.Render();
+
+viewport.ScrollUp(1);    // Back to lines 3-12
+viewport.Render();
+
+viewport.ScrollToTop();  // Back to lines 1-10
+viewport.Render();
+```
+
+### Columns
+```csharp
+using ConsolePrism.Layout;
+
+Column layout = new Column(gap: 2)  // 2 space gap between columns
+    .Add(new Panel(title: "Left", content: new Text("A")))
+    .Add(new Panel(title: "Middle", content: new Text("B")))
+    .Add(new Panel(title: "Right", content: new Text("C")));
+
+layout.Render();
+```
+
 ### Console Utilities
 ```csharp
 using ConsolePrism.Core;
