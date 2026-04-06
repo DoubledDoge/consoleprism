@@ -235,9 +235,9 @@ viewport.Render();
 using ConsolePrism.Layout;
 
 Column layout = new Column(gap: 2)  // 2 space gap between columns
-    .Add(new Panel(title: "Left", content: new Text("A")))
-    .Add(new Panel(title: "Middle", content: new Text("B")))
-    .Add(new Panel(title: "Right", content: new Text("C")));
+    .Add(new Panel(title: "Left", content: new ConsoleText("A")))
+    .Add(new Panel(title: "Middle", content: new ConsoleText("B")))
+    .Add(new Panel(title: "Right", content: new ConsoleText("C")));
 
 layout.Render();
 ```
