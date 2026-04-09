@@ -12,6 +12,7 @@ using Interfaces;
 public sealed class ConsoleText(IRenderer renderer, string content, ConsoleColor? color = null)
 	: ComponentBase
 {
+	private IRenderer _renderer = renderer;
 	private string Content { get; } = content;
 	private ConsoleColor? Color { get; } = color;
 
@@ -24,18 +25,30 @@ public sealed class ConsoleText(IRenderer renderer, string content, ConsoleColor
 		: this(ConsoleRenderer.Instance, content, color) { }
 
 	/// <inheritdoc/>
-	protected override IRenderer? SwapRenderer(IRenderer? swapRenderer) => null;
+	protected override bool SupportsRendererSwap => true;
+
+	/// <inheritdoc/>
+	protected override IRenderer SwapRenderer(IRenderer? swapRenderer)
+	{
+		IRenderer previous = _renderer;
+		if (swapRenderer is not null)
+		{
+			_renderer = swapRenderer;
+		}
+
+		return previous;
+	}
 
 	/// <inheritdoc/>
 	public override void Render()
 	{
 		if (Color.HasValue)
 		{
-			renderer.WriteColored(Content, Color.Value);
+			_renderer.WriteColored(Content, Color.Value);
 		}
 		else
 		{
-			renderer.Write(Content);
+			_renderer.Write(Content);
 		}
 	}
 }

@@ -12,6 +12,7 @@ using Interfaces;
 /// <param name="spacing">The number of blank lines inserted between each child component.</param>
 public sealed class Row(IRenderer renderer, int spacing = 0) : ComponentBase
 {
+	private IRenderer _renderer = renderer;
 	private readonly List<IRenderable> _children = [];
 	private int Spacing { get; } = spacing;
 
@@ -34,14 +35,26 @@ public sealed class Row(IRenderer renderer, int spacing = 0) : ComponentBase
 	}
 
 	/// <inheritdoc/>
-	protected override IRenderer? SwapRenderer(IRenderer? swapRenderer) => null;
+	protected override bool SupportsRendererSwap => true;
+
+	/// <inheritdoc/>
+	protected override IRenderer SwapRenderer(IRenderer? swapRenderer)
+	{
+		IRenderer previous = _renderer;
+		if (swapRenderer is not null)
+		{
+			_renderer = swapRenderer;
+		}
+
+		return previous;
+	}
 
 	/// <inheritdoc/>
 	public override void Render()
 	{
 		for (int i = 0; i < _children.Count; i++)
 		{
-			_children[i].Render(renderer);
+			_children[i].Render(_renderer);
 
 			if (Spacing <= 0 || i >= _children.Count - 1)
 			{
@@ -50,7 +63,7 @@ public sealed class Row(IRenderer renderer, int spacing = 0) : ComponentBase
 
 			for (int s = 0; s < Spacing; s++)
 			{
-				renderer.WriteLine();
+				_renderer.WriteLine();
 			}
 		}
 	}

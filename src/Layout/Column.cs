@@ -75,7 +75,8 @@ public sealed class Column(IRenderer renderer, int gap) : ComponentBase
 					}
 
 					child.Render(_bufferRenderers[i]);
-					return _bufferRenderers[i].Output.Split(Environment.NewLine);
+					return _bufferRenderers[i]
+						.Output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 				}
 			),
 		];

@@ -22,12 +22,19 @@ public sealed class Panel(
 	int verticalPadding = 0
 ) : ComponentBase
 {
+	private IRenderer _renderer = renderer;
 	private int HorizontalPadding { get; } = horizontalPadding;
 	private int VerticalPadding { get; } = verticalPadding;
 
 	/// <summary>
+	/// Gets or sets an explicit width for this panel in characters.
+	/// </summary>
+	// ReSharper disable once UnusedAutoPropertyAccessor.Global (Users may want to set it)
+	public int? Width { get; set; }
+
+	/// <summary>
 	/// Initializes a new <see cref="Panel"/> using the default console renderer.
-	/// </summary>s
+	/// </summary>
 	/// <param name="title">The title displayed in the panel's top border.</param>
 	/// <param name="content">The content to render inside the panel.</param>
 	/// <param name="horizontalPadding">The inner padding in characters on the left and right sides.</param>
@@ -41,14 +48,26 @@ public sealed class Panel(
 		: this(ConsoleRenderer.Instance, title, content, horizontalPadding, verticalPadding) { }
 
 	/// <inheritdoc/>
-	protected override IRenderer? SwapRenderer(IRenderer? swapRenderer) => null;
+	protected override bool SupportsRendererSwap => true;
+
+	/// <inheritdoc/>
+	protected override IRenderer SwapRenderer(IRenderer? swapRenderer)
+	{
+		IRenderer previous = _renderer;
+		if (swapRenderer is not null)
+		{
+			_renderer = swapRenderer;
+		}
+
+		return previous;
+	}
 
 	/// <inheritdoc/>
 	public override void Render()
 	{
 		BorderStyle border = ActiveTheme.Border;
 		ColorScheme colors = ActiveTheme.Colors;
-		int width = Console.WindowWidth;
+		int width = Width ?? Console.WindowWidth;
 		int innerWidth = width - 2;
 
 		RenderTopBorder(border, colors, innerWidth);
@@ -70,12 +89,12 @@ public sealed class Panel(
 
 	private void RenderContent(BorderStyle border, ColorScheme colors, int innerWidth)
 	{
+		// ReSharper disable once ConvertIfStatementToSwitchStatement (Simpler to read)
 		if (content is null)
 		{
 			return;
 		}
 
-		// Propagate theme override to content if applicable
 		if (content is ComponentBase { Theme: null } cb && Theme is not null)
 		{
 			cb.Theme = Theme;
@@ -86,25 +105,28 @@ public sealed class Panel(
 		StringRenderer sr = new();
 		content.Render(sr);
 
-		string[] lines = sr.Output.Split(Environment.NewLine);
+		string[] lines = sr.Output.Split(
+			Environment.NewLine,
+			StringSplitOptions.RemoveEmptyEntries
+		);
 
 		foreach (string line in lines)
 		{
-			renderer.WriteColored(border.Vertical.ToString(), colors.Primary);
-			renderer.Write(new string(' ', HorizontalPadding));
+			_renderer.WriteColored(border.Vertical.ToString(), colors.Primary);
+			_renderer.Write(new string(' ', HorizontalPadding));
 
 			string trimmed =
 				line.Length > contentWidth ? line[..contentWidth] : line.PadRight(contentWidth);
 
-			renderer.Write(trimmed);
-			renderer.Write(new string(' ', HorizontalPadding));
-			renderer.WriteColoredLine(border.Vertical.ToString(), colors.Primary);
+			_renderer.Write(trimmed);
+			_renderer.Write(new string(' ', HorizontalPadding));
+			_renderer.WriteColoredLine(border.Vertical.ToString(), colors.Primary);
 		}
 	}
 
 	private void RenderTopBorder(BorderStyle border, ColorScheme colors, int innerWidth)
 	{
-		renderer.WriteColored(border.TopLeft.ToString(), colors.Primary);
+		_renderer.WriteColored(border.TopLeft.ToString(), colors.Primary);
 
 		if (!string.IsNullOrEmpty(title))
 		{
@@ -113,29 +135,29 @@ public sealed class Panel(
 			int left = remaining / 2;
 			int right = remaining - left;
 
-			renderer.WriteColored(new string(border.Horizontal, left), colors.Primary);
-			renderer.WriteColored(label, colors.MenuTitle);
-			renderer.WriteColored(new string(border.Horizontal, right), colors.Primary);
+			_renderer.WriteColored(new string(border.Horizontal, left), colors.Primary);
+			_renderer.WriteColored(label, colors.MenuTitle);
+			_renderer.WriteColored(new string(border.Horizontal, right), colors.Primary);
 		}
 		else
 		{
-			renderer.WriteColored(new string(border.Horizontal, innerWidth), colors.Primary);
+			_renderer.WriteColored(new string(border.Horizontal, innerWidth), colors.Primary);
 		}
 
-		renderer.WriteColoredLine(border.TopRight.ToString(), colors.Primary);
+		_renderer.WriteColoredLine(border.TopRight.ToString(), colors.Primary);
 	}
 
 	private void RenderBottomBorder(BorderStyle border, ColorScheme colors, int innerWidth)
 	{
-		renderer.WriteColored(border.BottomLeft.ToString(), colors.Primary);
-		renderer.WriteColored(new string(border.Horizontal, innerWidth), colors.Primary);
-		renderer.WriteColoredLine(border.BottomRight.ToString(), colors.Primary);
+		_renderer.WriteColored(border.BottomLeft.ToString(), colors.Primary);
+		_renderer.WriteColored(new string(border.Horizontal, innerWidth), colors.Primary);
+		_renderer.WriteColoredLine(border.BottomRight.ToString(), colors.Primary);
 	}
 
 	private void RenderEmptyRow(BorderStyle border, ColorScheme colors, int innerWidth)
 	{
-		renderer.WriteColored(border.Vertical.ToString(), colors.Primary);
-		renderer.Write(new string(' ', innerWidth));
-		renderer.WriteColoredLine(border.Vertical.ToString(), colors.Primary);
+		_renderer.WriteColored(border.Vertical.ToString(), colors.Primary);
+		_renderer.Write(new string(' ', innerWidth));
+		_renderer.WriteColoredLine(border.Vertical.ToString(), colors.Primary);
 	}
 }

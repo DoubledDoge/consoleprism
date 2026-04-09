@@ -13,12 +13,14 @@ using Interfaces;
 /// <param name="height">The number of visible lines in the viewport.</param>
 public sealed class Viewport(IRenderer renderer, int height = 20) : ComponentBase
 {
+	private IRenderer _renderer = renderer;
 	private readonly List<IRenderable> _children = [];
 	private int Height { get; } = height;
 
 	/// <summary>
 	/// Gets the current scroll offset (zero-based line index of the top visible line).
 	/// </summary>
+	// ReSharper disable once MemberCanBePrivate.Global
 	public int ScrollOffset { get; private set; }
 
 	/// <summary>
@@ -49,12 +51,23 @@ public sealed class Viewport(IRenderer renderer, int height = 20) : ComponentBas
 	public void ScrollToTop() => ScrollOffset = 0;
 
 	/// <inheritdoc/>
-	protected override IRenderer? SwapRenderer(IRenderer? swapRenderer) => null;
+	protected override bool SupportsRendererSwap => true;
+
+	/// <inheritdoc/>
+	protected override IRenderer SwapRenderer(IRenderer? swapRenderer)
+	{
+		IRenderer previous = _renderer;
+		if (swapRenderer is not null)
+		{
+			_renderer = swapRenderer;
+		}
+
+		return previous;
+	}
 
 	/// <inheritdoc/>
 	public override void Render()
 	{
-		// Render all children into a shared buffer to determine total line count
 		StringRenderer sr = new();
 
 		foreach (IRenderable child in _children)
@@ -62,16 +75,17 @@ public sealed class Viewport(IRenderer renderer, int height = 20) : ComponentBas
 			child.Render(sr);
 		}
 
-		string[] allLines = sr.Output.Split(Environment.NewLine);
+		string[] allLines = sr.Output.Split(
+			Environment.NewLine,
+			StringSplitOptions.RemoveEmptyEntries
+		);
 
-		// Clamp scroll offset against actual content height
 		int maxOffset = Math.Max(0, allLines.Length - Height);
 		ScrollOffset = Math.Min(ScrollOffset, maxOffset);
 
-		// Render only the visible window using the clamped ScrollOffset
 		foreach (string line in allLines.Skip(ScrollOffset).Take(Height))
 		{
-			renderer.WriteLine(line);
+			_renderer.WriteLine(line);
 		}
 	}
 }
