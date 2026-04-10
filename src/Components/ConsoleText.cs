@@ -44,11 +44,11 @@ public sealed class ConsoleText(IRenderer renderer, string content, ConsoleColor
 	{
 		if (Color.HasValue)
 		{
-			_renderer.WriteColored(Content, Color.Value);
+			_renderer.WriteColoredLine(Content, Color.Value);
 		}
 		else
 		{
-			_renderer.Write(Content);
+			_renderer.WriteLine(Content);
 		}
 	}
 }
