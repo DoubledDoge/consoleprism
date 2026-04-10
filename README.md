@@ -265,6 +265,15 @@ ConsoleHelper.WriteEmptyLines(2);
 
 ## 🎨 Theming
 
+### List of available theme presets:
+- **NordTheme** - Arctic blue tones with rounded borders
+- **MonochromeTheme** - Grayscale for minimal or accessible output
+- **RetroTheme** - Amber tones with ASCII borders
+- **MatrixTheme** - Cascading greens against a dark background
+- **SunsetTheme** - Cosy oranges, magenta and soft whites to evoke a twilight atmosphere
+- **SolarizedTheme** - Warm amber and earthy tones with cool accent colours
+- **PastelTheme** - Muted, light tones for a gentle visual experience 
+
 ### Applying a Built-in Preset
 ```csharp
 using ConsolePrism.Themes;
@@ -272,8 +281,6 @@ using ConsolePrism.Themes.Presets;
 
 // Apply globally
 Theme.Apply(NordTheme.Instance);
-Theme.Apply(MonochromeTheme.Instance);
-Theme.Apply(RetroTheme.Instance);
 
 // Reset to default
 Theme.Apply(Theme.Default);
