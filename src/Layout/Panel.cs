@@ -1,6 +1,7 @@
 namespace ConsolePrism.Layout;
 
 using Components;
+using Core;
 using Core.Renderers;
 using Interfaces;
 using Themes;
@@ -14,22 +15,27 @@ using Themes;
 /// <param name="content">The content to render inside the panel.</param>
 /// <param name="horizontalPadding">The inner padding in characters on the left and right sides.</param>
 /// <param name="verticalPadding">The inner padding in characters on the top and bottom sides.</param>
+/// <param name="centerContent">Whether to centre each line of content horizontally within the panel.</param>
 public sealed class Panel(
 	IRenderer renderer,
 	string? title,
 	IRenderable? content,
 	int horizontalPadding = 1,
-	int verticalPadding = 0
+	int verticalPadding = 0,
+	bool centerContent = false
 ) : ComponentBase
 {
 	private IRenderer _renderer = renderer;
 	private int HorizontalPadding { get; } = horizontalPadding;
 	private int VerticalPadding { get; } = verticalPadding;
+	private bool CenterContent { get; } = centerContent;
 
 	/// <summary>
 	/// Gets or sets an explicit width for this panel in characters.
+	/// When <see langword="null"/>, defaults to <see cref="Console.WindowWidth"/>.
+	/// Set this when rendering inside a layout container such as <see cref="Column"/>
+	/// to prevent the panel from measuring the real terminal width.
 	/// </summary>
-	// ReSharper disable once UnusedAutoPropertyAccessor.Global (Users may want to set it)
 	public int? Width { get; set; }
 
 	/// <summary>
@@ -39,19 +45,28 @@ public sealed class Panel(
 	/// <param name="content">The content to render inside the panel.</param>
 	/// <param name="horizontalPadding">The inner padding in characters on the left and right sides.</param>
 	/// <param name="verticalPadding">The inner padding in characters on the top and bottom sides.</param>
+	/// <param name="centerContent">Whether to centre each line of content horizontally within the panel.</param>
 	public Panel(
 		string? title,
 		IRenderable? content,
 		int horizontalPadding = 1,
-		int verticalPadding = 0
+		int verticalPadding = 0,
+		bool centerContent = false
 	)
-		: this(ConsoleRenderer.Instance, title, content, horizontalPadding, verticalPadding) { }
+		: this(
+			ConsoleRenderer.Instance,
+			title,
+			content,
+			horizontalPadding,
+			verticalPadding,
+			centerContent
+		) { }
 
 	/// <inheritdoc/>
 	protected override bool SupportsRendererSwap => true;
 
 	/// <inheritdoc/>
-	protected override IRenderer SwapRenderer(IRenderer? swapRenderer)
+	protected override IRenderer? SwapRenderer(IRenderer? swapRenderer)
 	{
 		IRenderer previous = _renderer;
 		if (swapRenderer is not null)
@@ -89,7 +104,6 @@ public sealed class Panel(
 
 	private void RenderContent(BorderStyle border, ColorScheme colors, int innerWidth)
 	{
-		// ReSharper disable once ConvertIfStatementToSwitchStatement (Simpler to read)
 		if (content is null)
 		{
 			return;
@@ -100,6 +114,7 @@ public sealed class Panel(
 			cb.Theme = Theme;
 		}
 
+		// contentWidth is the usable region after subtracting padding on both sides
 		int contentWidth = innerWidth - HorizontalPadding * 2;
 
 		StringRenderer sr = new();
@@ -113,13 +128,26 @@ public sealed class Panel(
 		foreach (string line in lines)
 		{
 			_renderer.WriteColored(border.Vertical.ToString(), colors.Primary);
-			_renderer.Write(new string(' ', HorizontalPadding));
 
-			string trimmed =
-				line.Length > contentWidth ? line[..contentWidth] : line.PadRight(contentWidth);
+			if (CenterContent)
+			{
+				// Center within the full inner width; padding is baked into the centering
+				string centered =
+					line.Length > innerWidth
+						? line[..innerWidth]
+						: ConsoleHelper.PadCenter(line, innerWidth);
+				_renderer.Write(centered);
+			}
+			else
+			{
+				// Left-align within contentWidth, with explicit padding either side
+				string padded =
+					line.Length > contentWidth ? line[..contentWidth] : line.PadRight(contentWidth);
+				_renderer.Write(new string(' ', HorizontalPadding));
+				_renderer.Write(padded);
+				_renderer.Write(new string(' ', HorizontalPadding));
+			}
 
-			_renderer.Write(trimmed);
-			_renderer.Write(new string(' ', HorizontalPadding));
 			_renderer.WriteColoredLine(border.Vertical.ToString(), colors.Primary);
 		}
 	}
