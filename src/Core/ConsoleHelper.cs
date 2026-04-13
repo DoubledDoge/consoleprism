@@ -1,4 +1,6 @@
-﻿namespace ConsolePrism.Core;
+﻿using System.Text;
+
+namespace ConsolePrism.Core;
 
 /// <summary>
 /// Provides low-level console utilities for cursor control, text positioning,
@@ -34,6 +36,14 @@ public static class ConsoleHelper
 
 	/// <summary>Returns the current console window dimensions as a (Width, Height) tuple.</summary>
 	public static (int Width, int Height) WindowSize => (Console.WindowWidth, Console.WindowHeight);
+
+	/// <summary>
+	/// Sets the console output encoding.
+	/// Defaults to <see cref="Encoding.UTF8"/> if no encoding is specified.
+	/// </summary>
+	/// <param name="encoding">The encoding to apply. Defaults to <see cref="Encoding.UTF8"/>.</param>
+	public static void SetEncoding(Encoding? encoding = null) =>
+		Console.OutputEncoding = encoding ?? Encoding.UTF8;
 
 	/// <summary>
 	/// Writes text centered horizontally within the console window.
