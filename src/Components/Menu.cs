@@ -12,20 +12,20 @@ using Themes;
 /// <param name="title">The menu title.</param>
 /// <param name="renderer">The renderer to write output to.</param>
 /// <param name="style">The visual style used to render the menu.</param>
-/// <param name="footer">The menu footer. (Interactive + Numbered)</param>
+/// <param name="footer">The menu footer. Defaults to null. (Interactive + Numbered)</param>
 /// <param name="options">The selectable options.</param>
 public sealed class Menu(
 	string title,
 	IRenderer renderer,
 	MenuStyle style = MenuStyle.Interactive,
-	string footer = "",
+	string? footer = null,
 	params string[] options
 ) : ComponentBase, IInteractable
 {
 	private IRenderer _renderer = renderer;
 	private readonly List<string> _options = [.. options];
 	private string Title { get; } = title;
-	private string Footer { get; } = footer;
+	private string? Footer { get; } = footer;
 	private MenuStyle Style { get; } = style;
 
 	/// <summary>
@@ -34,9 +34,9 @@ public sealed class Menu(
 	/// </summary>
 	/// <param name="title">The menu title.</param>
 	/// <param name="style">The visual style used to render the menu.</param>
-	/// <param name="footer">The menu footer. (Interactive + Numbered)</param>
+	/// <param name="footer">The menu footer. Defaults to null. (Interactive + Numbered)</param>
 	/// <param name="options">The selectable options.</param>
-	public Menu(string title, MenuStyle style, string footer, params string[] options)
+	public Menu(string title, MenuStyle style, string? footer = null, params string[] options)
 		: this(title, ConsoleRenderer.Instance, style, footer, options) { }
 
 	/// <inheritdoc />
@@ -101,7 +101,7 @@ public sealed class Menu(
 			_renderer.WriteColoredLine(_options[i], colors.MenuOption);
 		}
 
-		_renderer.WriteColoredLine(Footer, colors.MenuTitle);
+		_renderer.WriteColoredLine(Footer ?? string.Empty, colors.MenuTitle);
 		_renderer.WriteLine();
 	}
 
@@ -148,7 +148,7 @@ public sealed class Menu(
 			}
 		}
 
-		_renderer.WriteColoredLine(Footer, colors.MenuTitle);
+		_renderer.WriteColoredLine(Footer ?? string.Empty, colors.MenuTitle);
 		_renderer.WriteLine();
 		_renderer.WriteColoredLine("Use up/down arrows to navigate, Enter to select", colors.Muted);
 	}

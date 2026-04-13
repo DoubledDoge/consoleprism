@@ -12,8 +12,8 @@ using Themes;
 /// <param name="renderer">The renderer to write output to.</param>
 /// <param name="message">The message to display.</param>
 /// <param name="bordered">If the notification is rendered with a bordered box.</param>
-/// <param name="hasPrefix">If the notification has a prefix or not. ([✓], [!], etc.)</param>
 /// <param name="level">The severity level that determines the notification's colour.</param>
+/// <param name="hasPrefix">If the notification has a prefix or not. Defaults to false. ([✓], [!], etc.)</param>
 /// <param name="durationMs">The duration in milliseconds before the notification
 /// is automatically cleared. When <c>0</c>, the notification persists
 /// until manually cleared.</param>
@@ -21,8 +21,8 @@ public sealed class Notification(
 	string message,
 	IRenderer renderer,
 	bool bordered,
-	bool hasPrefix = false,
 	NotificationLevel level = NotificationLevel.Info,
+	bool hasPrefix = false,
 	int durationMs = 0
 ) : ComponentBase
 {
@@ -37,19 +37,19 @@ public sealed class Notification(
 	/// </summary>
 	/// <param name="message">The message to display.</param>
 	/// <param name="bordered">If the notification is rendered with a bordered box.</param>
-	/// <param name="hasPrefix">If the notification has a prefix or not. ([✓], [!], etc.)</param>
 	/// <param name="level">The severity level that determines the notification's colour.</param>
+	/// <param name="hasPrefix">If the notification has a prefix or not. Defaults to false. ([✓], [!], etc.)</param>
 	/// <param name="durationMs">The duration in milliseconds before the notification
 	/// is automatically cleared. When <c>0</c>, the notification persists
 	/// until manually cleared.</param>
 	public Notification(
 		string message,
 		bool bordered,
-		bool hasPrefix,
 		NotificationLevel level = NotificationLevel.Info,
+		bool hasPrefix = false,
 		int durationMs = 0
 	)
-		: this(message, ConsoleRenderer.Instance, bordered, hasPrefix, level, durationMs) { }
+		: this(message, ConsoleRenderer.Instance, bordered, level, hasPrefix, durationMs) { }
 
 	/// <inheritdoc/>
 	public override void Render()

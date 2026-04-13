@@ -14,7 +14,7 @@ using Themes;
 /// <param name="inPlace">If the bar updates in place which
 /// overwrites the current console line rather than advancing to a new one.</param>
 /// <param name="total">The optional max progress value.</param>
-/// <param name="barWidth">The width of the bar in characters.</param>
+/// <param name="barWidth">The width of the bar in characters. Defaults to 40.</param>
 public sealed class ProgressBar(
 	IRenderer renderer,
 	int current,
@@ -40,8 +40,8 @@ public sealed class ProgressBar(
 	/// <param name="total">The optional max progress value.</param>
 	/// <param name="inPlace">If the bar updates in place which
 	/// overwrites the current console line rather than advancing to a new one.</param>
-	/// <param name="barWidth">The width of the bar in characters.</param>
-	public ProgressBar(int current, string? label, int total, bool inPlace, int barWidth)
+	/// <param name="barWidth">The width of the bar in characters. Defaults to 40.</param>
+	public ProgressBar(int current, string? label, int total, bool inPlace, int barWidth = 40)
 		: this(ConsoleRenderer.Instance, current, label, inPlace, total, barWidth) { }
 
 	/// <inheritdoc />
