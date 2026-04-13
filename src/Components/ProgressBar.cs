@@ -44,6 +44,12 @@ public sealed class ProgressBar(
 	public ProgressBar(int current, string? label, int total, bool inPlace, int barWidth)
 		: this(ConsoleRenderer.Instance, current, label, inPlace, total, barWidth) { }
 
+	/// <inheritdoc />
+	protected override bool SupportsRendererSwap => false;
+
+	/// <inheritdoc />
+	protected override IRenderer? SwapRenderer(IRenderer? swapRenderer) => null;
+
 	/// <inheritdoc/>
 	public override void Render()
 	{
