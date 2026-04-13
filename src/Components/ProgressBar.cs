@@ -14,23 +14,23 @@ using Themes;
 /// <param name="inPlace">If the bar updates in place which
 /// overwrites the current console line rather than advancing to a new one.</param>
 /// <param name="total">The optional max progress value.</param>
+/// <param name="barWidth">The width of the bar in characters.</param>
 public sealed class ProgressBar(
 	IRenderer renderer,
 	int current,
 	string? label,
 	bool inPlace,
-	int total = 100
+	int total = 100,
+	int barWidth = 40
 ) : ComponentBase
 {
 	private string? Label { get; } = label;
 	private int Total { get; } = total;
 	private bool InPlace { get; } = inPlace;
+	private int BarWidth { get; } = barWidth;
 
 	/// <summary>Gets or sets the current progress value of the bar.</summary>
-	public int Current { get; set; } = current;
-
-	/// <summary>Gets or sets the width of the bar in characters.</summary>
-	public int BarWidth { get; set; } = 40;
+	private int Current { get; set; } = current;
 
 	/// <summary>
 	/// Initializes a new <see cref="ProgressBar"/> using the default console renderer.
@@ -40,8 +40,9 @@ public sealed class ProgressBar(
 	/// <param name="total">The optional max progress value.</param>
 	/// <param name="inPlace">If the bar updates in place which
 	/// overwrites the current console line rather than advancing to a new one.</param>
-	public ProgressBar(int current, string? label, int total, bool inPlace)
-		: this(ConsoleRenderer.Instance, current, label, inPlace, total) { }
+	/// <param name="barWidth">The width of the bar in characters.</param>
+	public ProgressBar(int current, string? label, int total, bool inPlace, int barWidth)
+		: this(ConsoleRenderer.Instance, current, label, inPlace, total, barWidth) { }
 
 	/// <inheritdoc/>
 	public override void Render()
