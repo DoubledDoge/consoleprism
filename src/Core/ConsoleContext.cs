@@ -22,7 +22,7 @@ public sealed class ConsoleContext : IDisposable
 	private bool _disposed;
 
 	/// <summary>
-	/// Initialises a new console context, immediately applying the given theme.
+	/// Initializes a new console context, immediately applying the given theme.
 	/// </summary>
 	/// <param name="theme">The theme to apply for the duration of this context.</param>
 	public ConsoleContext(Theme theme)
