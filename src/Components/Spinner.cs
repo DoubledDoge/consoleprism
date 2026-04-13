@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace ConsolePrism.Components;
 
 using Core;
@@ -100,6 +102,8 @@ public sealed class Spinner(
 			return;
 		}
 
+		ConsoleHelper.SetEncoding(Encoding.UTF8);
+
 		ConsoleHelper.HideCursor();
 		_cts = new CancellationTokenSource();
 		CancellationToken token = _cts.Token;
@@ -150,6 +154,7 @@ public sealed class Spinner(
 			renderer.WriteColoredLine(finalMessage, ActiveTheme.Colors.Success);
 		}
 
+		ConsoleHelper.SetEncoding(Encoding.ASCII);
 		ConsoleHelper.ShowCursor();
 	}
 
