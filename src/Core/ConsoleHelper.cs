@@ -39,11 +39,11 @@ public static class ConsoleHelper
 
 	/// <summary>
 	/// Sets the console output encoding.
-	/// Defaults to <see cref="Encoding.UTF8"/> if no encoding is specified.
+	/// Defaults to <see cref="Encoding.ASCII"/> if no encoding is specified.
 	/// </summary>
-	/// <param name="encoding">The encoding to apply. Defaults to <see cref="Encoding.UTF8"/>.</param>
+	/// <param name="encoding">The encoding to apply. Defaults to <see cref="Encoding.ASCII"/>.</param>
 	public static void SetEncoding(Encoding? encoding = null) =>
-		Console.OutputEncoding = encoding ?? Encoding.UTF8;
+		Console.OutputEncoding = encoding ?? Encoding.ASCII;
 
 	/// <summary>
 	/// Writes text centered horizontally within the console window.
