@@ -12,28 +12,32 @@ using Themes;
 /// <param name="title">The menu title.</param>
 /// <param name="renderer">The renderer to write output to.</param>
 /// <param name="style">The visual style used to render the menu.</param>
+/// <param name="footer">The menu footer. (Interactive + Numbered)</param>
 /// <param name="options">The selectable options.</param>
 public sealed class Menu(
 	string title,
 	IRenderer renderer,
 	MenuStyle style = MenuStyle.Interactive,
+	string footer = "",
 	params string[] options
 ) : ComponentBase, IInteractable
 {
 	private IRenderer _renderer = renderer;
 	private readonly List<string> _options = [.. options];
 	private string Title { get; } = title;
+	private string Footer { get; } = footer;
 	private MenuStyle Style { get; } = style;
 
 	/// <summary>
-	/// Initializes a new <see cref="Menu"/> with a title, style, and options,
+	/// Initializes a new <see cref="Menu"/> with a title, style, optional footer, and options,
 	/// using the default console renderer.
 	/// </summary>
 	/// <param name="title">The menu title.</param>
 	/// <param name="style">The visual style used to render the menu.</param>
+	/// <param name="footer">The menu footer. (Interactive + Numbered)</param>
 	/// <param name="options">The selectable options.</param>
-	public Menu(string title, MenuStyle style, params string[] options)
-		: this(title, ConsoleRenderer.Instance, style, options) { }
+	public Menu(string title, MenuStyle style, string footer, params string[] options)
+		: this(title, ConsoleRenderer.Instance, style, footer, options) { }
 
 	/// <inheritdoc />
 	protected override bool SupportsRendererSwap => true;
@@ -87,7 +91,6 @@ public sealed class Menu(
 	private void RenderNumbered()
 	{
 		ColorScheme colors = ActiveTheme.Colors;
-		Console.Clear();
 
 		_renderer.WriteColoredLine(Title, colors.MenuTitle);
 		_renderer.WriteLine();
@@ -98,6 +101,7 @@ public sealed class Menu(
 			_renderer.WriteColoredLine(_options[i], colors.MenuOption);
 		}
 
+		_renderer.WriteColoredLine(Footer, colors.MenuTitle);
 		_renderer.WriteLine();
 	}
 
@@ -144,13 +148,13 @@ public sealed class Menu(
 			}
 		}
 
+		_renderer.WriteColoredLine(Footer, colors.MenuTitle);
 		_renderer.WriteLine();
 		_renderer.WriteColoredLine("Use up/down arrows to navigate, Enter to select", colors.Muted);
 	}
 
 	private int InteractInteractive()
 	{
-		Console.Clear();
 		ConsoleHelper.HideCursor();
 
 		int selectedIndex = 0;
@@ -222,7 +226,6 @@ public sealed class Menu(
 
 	private int InteractBordered()
 	{
-		Console.Clear();
 		RenderBordered();
 		_renderer.WriteLine();
 
