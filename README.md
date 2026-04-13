@@ -382,9 +382,6 @@ ConsolePrism/
 │   ├── BorderStyle       → Border character set definition
 │   ├── Theme             → Unified theme object (ColorScheme + BorderStyle)
 │   └── Presets/
-│       ├── NordTheme     → Arctic blue tones with rounded borders
-│       ├── MonochromeTheme → Grayscale for minimal or accessible output
-│       └── RetroTheme    → Amber tones with ASCII borders
 │
 ├── Core/
 │   ├── ColorWriter       → Semantic colored text output
@@ -401,6 +398,7 @@ ConsolePrism/
 │   ├── ProgressBar       → Static and in-place animated progress bars
 │   ├── Spinner           → Animated spinners for async operations
 │   ├── Notification      → Transient styled messages with optional auto-dismiss
+|   ├── ConsoleText       → Simple text for use with the layout components
 │   └── Prompt            → Styled input prompt with optional masked entry
 │
 └── Layout/
