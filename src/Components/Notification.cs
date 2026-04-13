@@ -12,6 +12,7 @@ using Themes;
 /// <param name="renderer">The renderer to write output to.</param>
 /// <param name="message">The message to display.</param>
 /// <param name="bordered">If the notification is rendered with a bordered box.</param>
+/// <param name="hasPrefix">If the notification has a prefix or not. ([✓], [!], etc.)</param>
 /// <param name="level">The severity level that determines the notification's colour.</param>
 /// <param name="durationMs">The duration in milliseconds before the notification
 /// is automatically cleared. When <c>0</c>, the notification persists
@@ -20,6 +21,7 @@ public sealed class Notification(
 	string message,
 	IRenderer renderer,
 	bool bordered,
+	bool hasPrefix = false,
 	NotificationLevel level = NotificationLevel.Info,
 	int durationMs = 0
 ) : ComponentBase
@@ -28,12 +30,14 @@ public sealed class Notification(
 	private NotificationLevel Level { get; } = level;
 	private int DurationMs { get; } = durationMs;
 	private bool Bordered { get; } = bordered;
+	private bool HasPrefix { get; } = hasPrefix;
 
 	/// <summary>
 	/// Initializes a new <see cref="Notification"/> using the default console renderer.
 	/// </summary>
 	/// <param name="message">The message to display.</param>
 	/// <param name="bordered">If the notification is rendered with a bordered box.</param>
+	/// <param name="hasPrefix">If the notification has a prefix or not. ([✓], [!], etc.)</param>
 	/// <param name="level">The severity level that determines the notification's colour.</param>
 	/// <param name="durationMs">The duration in milliseconds before the notification
 	/// is automatically cleared. When <c>0</c>, the notification persists
@@ -41,16 +45,18 @@ public sealed class Notification(
 	public Notification(
 		string message,
 		bool bordered,
+		bool hasPrefix,
 		NotificationLevel level = NotificationLevel.Info,
 		int durationMs = 0
 	)
-		: this(message, ConsoleRenderer.Instance, bordered, level, durationMs) { }
+		: this(message, ConsoleRenderer.Instance, bordered, hasPrefix, level, durationMs) { }
 
 	/// <inheritdoc/>
 	public override void Render()
 	{
 		ConsoleColor color = ResolveColor();
-		string prefix = ResolvePrefix();
+
+		string prefix = HasPrefix ? ResolvePrefix() : string.Empty;
 		string full = $"{prefix} {Message}";
 
 		if (Bordered)
