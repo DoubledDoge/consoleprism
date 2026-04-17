@@ -16,27 +16,22 @@ using Themes;
 /// <param name="horizontalPadding">The inner padding in characters on the left and right sides.</param>
 /// <param name="verticalPadding">The inner padding in characters on the top and bottom sides.</param>
 /// <param name="centerContent">Whether to centre each line of content horizontally within the panel.</param>
+/// <param name="width">An explicit width for this panel in characters.</param>
 public sealed class Panel(
 	IRenderer renderer,
 	string? title,
 	IRenderable? content,
 	int horizontalPadding = 1,
 	int verticalPadding = 0,
-	bool centerContent = false
+	bool centerContent = false,
+	int width = 0
 ) : ComponentBase
 {
 	private IRenderer _renderer = renderer;
 	private int HorizontalPadding { get; } = horizontalPadding;
 	private int VerticalPadding { get; } = verticalPadding;
 	private bool CenterContent { get; } = centerContent;
-
-	/// <summary>
-	/// Gets or sets an explicit width for this panel in characters.
-	/// When <see langword="null"/>, defaults to <see cref="Console.WindowWidth"/>.
-	/// Set this when rendering inside a layout container such as <see cref="Column"/>
-	/// to prevent the panel from measuring the real terminal width.
-	/// </summary>
-	public int? Width { get; set; }
+	private int? Width { get; } = width;
 
 	/// <summary>
 	/// Initializes a new <see cref="Panel"/> using the default console renderer.
@@ -46,12 +41,14 @@ public sealed class Panel(
 	/// <param name="horizontalPadding">The inner padding in characters on the left and right sides.</param>
 	/// <param name="verticalPadding">The inner padding in characters on the top and bottom sides.</param>
 	/// <param name="centerContent">Whether to centre each line of content horizontally within the panel.</param>
+	/// <param name="width">An explicit width for this panel in characters.</param>
 	public Panel(
 		string? title,
 		IRenderable? content,
 		int horizontalPadding = 1,
 		int verticalPadding = 0,
-		bool centerContent = false
+		bool centerContent = false,
+		int width = 0
 	)
 		: this(
 			ConsoleRenderer.Instance,
@@ -59,14 +56,15 @@ public sealed class Panel(
 			content,
 			horizontalPadding,
 			verticalPadding,
-			centerContent
+			centerContent,
+			width
 		) { }
 
 	/// <inheritdoc/>
 	protected override bool SupportsRendererSwap => true;
 
 	/// <inheritdoc/>
-	protected override IRenderer? SwapRenderer(IRenderer? swapRenderer)
+	protected override IRenderer SwapRenderer(IRenderer? swapRenderer)
 	{
 		IRenderer previous = _renderer;
 		if (swapRenderer is not null)
@@ -82,8 +80,8 @@ public sealed class Panel(
 	{
 		BorderStyle border = ActiveTheme.Border;
 		ColorScheme colors = ActiveTheme.Colors;
-		int width = Width ?? Console.WindowWidth;
-		int innerWidth = width - 2;
+		int renderWidth = Width ?? Console.WindowWidth;
+		int innerWidth = renderWidth - 2;
 
 		RenderTopBorder(border, colors, innerWidth);
 
@@ -131,7 +129,7 @@ public sealed class Panel(
 
 			if (CenterContent)
 			{
-				// Center within the full inner width; padding is baked into the centering
+				// Centre within the full inner width; padding is baked into the centering
 				string centered =
 					line.Length > innerWidth
 						? line[..innerWidth]
