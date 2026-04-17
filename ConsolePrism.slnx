@@ -1,4 +1,7 @@
-﻿<Solution>
+﻿<Solution
+	Version="1.2.3"
+	Description="Another opinionated console UI framework for .NET applications."
+>
 	<Configurations>
 		<Platform Name="Any CPU" />
 		<Platform Name="x64" />
