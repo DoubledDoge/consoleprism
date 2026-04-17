@@ -130,7 +130,6 @@ public sealed class Menu(
 	{
 		ColorScheme colors = ActiveTheme.Colors;
 
-		Console.SetCursorPosition(0, 0);
 		_renderer.WriteColoredLine(Title, colors.MenuTitle);
 		_renderer.WriteLine();
 
@@ -158,10 +157,12 @@ public sealed class Menu(
 		ConsoleHelper.HideCursor();
 
 		int selectedIndex = 0;
+		int startRow = Console.CursorTop;
 		ConsoleKey key;
 
 		do
 		{
+			Console.SetCursorPosition(0, startRow);
 			RenderInteractive(selectedIndex);
 			key = Console.ReadKey(true).Key;
 
