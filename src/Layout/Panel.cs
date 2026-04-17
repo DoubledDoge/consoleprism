@@ -24,7 +24,7 @@ public sealed class Panel(
 	int horizontalPadding = 1,
 	int verticalPadding = 0,
 	bool centerContent = false,
-	int width = 0
+	int? width = null
 ) : ComponentBase
 {
 	private IRenderer _renderer = renderer;
@@ -48,7 +48,7 @@ public sealed class Panel(
 		int horizontalPadding = 1,
 		int verticalPadding = 0,
 		bool centerContent = false,
-		int width = 0
+		int? width = null
 	)
 		: this(
 			ConsoleRenderer.Instance,
