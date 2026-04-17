@@ -229,7 +229,7 @@ public sealed class Table(
 	{
 		if (string.IsNullOrEmpty(text))
 		{
-			return [""];
+			return [string.Empty];
 		}
 
 		if (text.Length <= maxWidth)
