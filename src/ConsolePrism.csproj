@@ -20,7 +20,7 @@
 
 	<PropertyGroup Label="Package Metadata">
 		<PackageId>ConsolePrism</PackageId>
-		<Version>1.2.3</Version>
+		<Version>1.2.4</Version>
 		<Authors>DoubledDoge</Authors>
 		<Description>Another opinionated console UI framework for .NET applications.</Description>
 		<PackageIcon>icon.png</PackageIcon>
