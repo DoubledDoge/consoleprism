@@ -24,6 +24,7 @@ public sealed class ProgressBar(
 	int barWidth = 40
 ) : ComponentBase
 {
+	private IRenderer _renderer = renderer;
 	private string? Label { get; } = label;
 	private int Total { get; } = total;
 	private bool InPlace { get; } = inPlace;
@@ -45,10 +46,18 @@ public sealed class ProgressBar(
 		: this(ConsoleRenderer.Instance, current, label, inPlace, total, barWidth) { }
 
 	/// <inheritdoc />
-	protected override bool SupportsRendererSwap => false;
+	protected override bool SupportsRendererSwap => true;
 
 	/// <inheritdoc />
-	protected override IRenderer? SwapRenderer(IRenderer? swapRenderer) => null;
+	protected override IRenderer SwapRenderer(IRenderer? swapRenderer)
+	{
+		IRenderer previous = _renderer;
+		if (swapRenderer is not null)
+		{
+			_renderer = swapRenderer;
+		}
+		return previous;
+	}
 
 	/// <inheritdoc/>
 	public override void Render()
@@ -67,17 +76,17 @@ public sealed class ProgressBar(
 
 		if (!string.IsNullOrEmpty(Label))
 		{
-			renderer.WriteColored($"{Label}: ", colors.ProgressBarText);
+			_renderer.WriteColored($"{Label}: ", colors.ProgressBarText);
 		}
 
-		renderer.Write("[");
-		renderer.WriteColored(new string('█', filledWidth), colors.ProgressBarComplete);
-		renderer.WriteColored(new string('░', emptyWidth), colors.ProgressBarIncomplete);
-		renderer.WriteColored($"] {percentage:P0}", colors.ProgressBarText);
+		_renderer.Write("[");
+		_renderer.WriteColored(new string('█', filledWidth), colors.ProgressBarComplete);
+		_renderer.WriteColored(new string('░', emptyWidth), colors.ProgressBarIncomplete);
+		_renderer.WriteColored($"] {percentage:P0}", colors.ProgressBarText);
 		if (InPlace)
 		{
 			ConsoleHelper.HideCursor();
-			renderer.SetCursorPosition(startLeft, startTop);
+			_renderer.SetCursorPosition(startLeft, startTop);
 			if (renderCurrent >= renderTotal)
 			{
 				ConsoleHelper.ShowCursor();
@@ -85,7 +94,7 @@ public sealed class ProgressBar(
 		}
 		else
 		{
-			renderer.WriteLine();
+			_renderer.WriteLine();
 		}
 	}
 }
