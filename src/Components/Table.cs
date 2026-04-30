@@ -19,7 +19,7 @@ using Themes;
 /// <param name="columnWidths">Optional explicit column widths.</param>
 public sealed class Table(
 	string[] headers,
-	string[][]? data,
+	TableCell[][]? data,
 	IRenderer renderer,
 	int[]? columnWidths = null
 ) : ComponentBase
@@ -36,14 +36,32 @@ public sealed class Table(
 	/// Optional explicit column widths. When <see langword="null"/>, widths are
 	/// calculated automatically from content.
 	/// </param>
-	public Table(string[] headers, string[][]? data, int[]? columnWidths = null)
+	public Table(string[] headers, TableCell[][]? data, int[]? columnWidths = null)
 		: this(headers, data, ConsoleRenderer.Instance, columnWidths) { }
+
+	/// <summary>
+	/// Initializes a new <see cref="Table"/> with the default console renderer using a string array.
+	/// </summary>
+	/// <param name="headers">Column header labels.</param>
+	/// <param name="data">
+	/// A jagged array of cell values, where the first dimension is rows
+	/// and the second is columns. May be <see langword="null"/> to render headers only.
+	/// </param>
+	/// <param name="columnWidths">
+	/// Optional explicit column widths. When <see langword="null"/>, widths are
+	/// calculated automatically from content.
+	/// </param>
+	public Table(string[] headers, string[][]? data, int[]? columnWidths = null)
+		: this(headers, ConvertToStringCells(data), ConsoleRenderer.Instance, columnWidths) { }
 
 	/// <inheritdoc />
 	protected override bool SupportsRendererSwap => false;
 
 	/// <inheritdoc />
 	protected override IRenderer? SwapRenderer(IRenderer? swapRenderer) => null;
+
+	private static TableCell[][]? ConvertToStringCells(string[][]? data) =>
+		data?.Select(row => row.Select(cell => (TableCell)cell).ToArray()).ToArray();
 
 	/// <inheritdoc/>
 	public override void Render()
@@ -88,7 +106,7 @@ public sealed class Table(
 			{
 				for (int col = 0; col < columnCount; col++)
 				{
-					widths[col] = Math.Max(widths[col], data[row][col].Length);
+					widths[col] = Math.Max(widths[col], data[row][col].Text.Length);
 				}
 			}
 		}
@@ -178,16 +196,18 @@ public sealed class Table(
 		for (int row = 0; row < rowCount; row++)
 		{
 			int columnCount = data[row].Length;
-			List<string[]> wrappedRows = WrapRow(row, widths);
+			List<TableCell[]> wrappedRows = WrapRow(row, widths);
 
-			foreach (string[] wrappedLine in wrappedRows)
+			foreach (TableCell[] wrappedLine in wrappedRows)
 			{
 				renderer.WriteColored(border.Vertical.ToString(), colors.TableBorder);
 
 				for (int col = 0; col < columnCount; col++)
 				{
-					string cell = col < wrappedLine.Length ? wrappedLine[col] : string.Empty;
-					renderer.WriteColored(PadCell(cell, widths[col]), colors.TableData);
+					TableCell cell =
+						col < wrappedLine.Length ? wrappedLine[col] : new TableCell(string.Empty);
+					ConsoleColor cellColor = cell.Color ?? colors.TableData;
+					renderer.WriteColored(PadCell(cell.Text, widths[col]), cellColor);
 					renderer.WriteColored(border.Vertical.ToString(), colors.TableBorder);
 				}
 
@@ -196,7 +216,7 @@ public sealed class Table(
 		}
 	}
 
-	private List<string[]> WrapRow(int row, int[] widths)
+	private List<TableCell[]> WrapRow(int row, int[] widths)
 	{
 		int columnCount = data![row].Length;
 		List<string>[] cellLines = new List<string>[columnCount];
@@ -204,19 +224,20 @@ public sealed class Table(
 
 		for (int col = 0; col < columnCount; col++)
 		{
-			cellLines[col] = WrapText(data[row][col], widths[col] - 2);
+			cellLines[col] = WrapText(data[row][col].Text, widths[col] - 2);
 			maxLines = Math.Max(maxLines, cellLines[col].Count);
 		}
 
-		List<string[]> wrappedRows = [];
+		List<TableCell[]> wrappedRows = [];
 
 		for (int line = 0; line < maxLines; line++)
 		{
-			string[] wrappedLine = new string[columnCount];
+			TableCell[] wrappedLine = new TableCell[columnCount];
 			for (int col = 0; col < columnCount; col++)
 			{
-				wrappedLine[col] =
-					line < cellLines[col].Count ? cellLines[col][line] : string.Empty;
+				string text = line < cellLines[col].Count ? cellLines[col][line] : string.Empty;
+
+				wrappedLine[col] = new TableCell(text, data[row][col].Color);
 			}
 
 			wrappedRows.Add(wrappedLine);
