@@ -35,31 +35,30 @@ public sealed class AppShell(
 	public override void Render()
 	{
 		Console.Clear();
-
 		int width = Console.WindowWidth;
 		ColorScheme colors = ActiveTheme.Colors;
 
 		string headerText = ConsoleHelper.PadCenter($" {Title.ToUpperInvariant()} ", width - 2);
 		new Panel(title: null, content: new ConsoleText(headerText, colors.Highlight)).Render();
-
 		ConsoleHelper.WriteEmptyLines(1);
 
 		Content.Render();
 
-		int currentLine = Console.CursorTop;
-		int footerLine = Console.WindowHeight - 3; // Account for the panel's borders
+		int contentEndLine = Console.CursorTop;
 
-		if (currentLine < footerLine)
+		int footerLine = Console.WindowHeight - 3;
+		if (contentEndLine < footerLine)
 		{
-			ConsoleHelper.WriteEmptyLines(footerLine - currentLine);
+			ConsoleHelper.WriteEmptyLines(footerLine - contentEndLine);
 		}
 
 		string footerL = LeftFooter ?? string.Empty;
 		string footerR = RightFooter ?? string.Empty;
-
 		int spaceCount = Math.Max(0, width - 4 - footerL.Length - footerR.Length);
 		string footerText = footerL + new string(' ', spaceCount) + footerR;
 
 		new Panel(title: null, content: new ConsoleText(footerText, colors.Muted)).Render();
+
+		Console.SetCursorPosition(0, contentEndLine);
 	}
 }
