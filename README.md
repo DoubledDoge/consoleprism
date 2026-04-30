@@ -23,7 +23,7 @@ An opinionated, component-based UI framework for .NET console applications. Buil
 - [🎨 Theming](#-theming)
 - [🏗️ Architecture](#-architecture)
 - [💻 Requirements](#-requirements)
-- [📄 License](#-license)
+- [📄 Licence](#-licence)
 - [🤝 Contributing](#-contributing)
 
 ---
@@ -58,7 +58,7 @@ dotnet add reference path/to/src/ConsolePrism.csproj
 
 ## 📚 Usage Guide
 
-### Semantic Color Output
+### Semantic Colour Output
 ```csharp
 using ConsolePrism.Core;
 
@@ -106,6 +106,15 @@ string[][] data = [
 ]; // Can be nullable for empty cells
 
 new Table(headers, data).Render();
+
+// Alternatively for coloured cells
+TableCell[][] colouredData = [
+    ["Alice",   new TableCell("1250", ConsoleColor.Green), "10"],
+    ["Bob",     new TableCell("980", ConsoleColor.Red),    "8" ],
+    ["Charlie", new TableCell("1500", ConsoleColor.Yellow),"12"],
+];
+
+new Table(headers, colouredData).Render();
 
 // Custom column widths
 int[] widths = [15, 10, 8];
@@ -240,6 +249,28 @@ Column layout = new Column(gap: 2)  // 2 space gap between columns
     .Add(new Panel(title: "Right", content: new ConsoleText("C")));
 
 layout.Render();
+```
+
+### App Shell
+```csharp
+using ConsolePrism.Layout;
+using ConsolePrism.Components;
+
+Panel mainContent = new(
+    title: "Dashboard",
+    content: new ConsoleText("Welcome to the application!"),
+    horizontalPadding: 2
+);
+
+// Wrap the content in the AppShell
+AppShell shell = new(
+    title: "MY AWESOME CLI",
+    content: mainContent,
+    leftFooter: "Status: Online",
+    rightFooter: "v1.0.0 | Press ESC to exit"
+);
+
+shell.Render();
 ```
 
 ### Console Utilities
@@ -395,6 +426,7 @@ ConsolePrism/
 |   ├── ComponentBase     → Abstract base with theme resolution and renderer swapping
 │   ├── Menu              → Numbered, interactive, and bordered menu styles
 │   ├── Table             → Auto-sizing bordered table with text wrapping
+|   ├── TableCell         → Cell content with optional colour
 │   ├── ProgressBar       → Static and in-place animated progress bars
 │   ├── Spinner           → Animated spinners for async operations
 │   ├── Notification      → Transient styled messages with optional auto-dismiss
@@ -405,6 +437,7 @@ ConsolePrism/
     ├── Panel             → Bordered content container with title support
     ├── Row               → Vertical component stacking with optional spacing
     ├── Column            → Horizontal side-by-side component layout
+    ├── AppShell          → Common application layout with header, footer, and main content
     └── Viewport          → Scrollable content region with fixed visible height
 ```
 
@@ -418,7 +451,7 @@ ConsolePrism/
 
 ---
 
-## 📄 License
+## 📄 Licence
 
 See [LICENCE](LICENSE) for details. (MIT Licence)
 
