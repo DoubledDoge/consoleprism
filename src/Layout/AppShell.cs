@@ -35,7 +35,9 @@ public sealed class AppShell(
 	public override void Render()
 	{
 		Console.Clear();
+
 		int width = Console.WindowWidth;
+		int height = Console.WindowHeight;
 		ColorScheme colors = ActiveTheme.Colors;
 
 		string headerText = ConsoleHelper.PadCenter($" {Title.ToUpperInvariant()} ", width - 2);
@@ -46,11 +48,9 @@ public sealed class AppShell(
 
 		int contentEndLine = Console.CursorTop;
 
-		int footerLine = Console.WindowHeight - 3;
-		if (contentEndLine < footerLine)
-		{
-			ConsoleHelper.WriteEmptyLines(footerLine - contentEndLine);
-		}
+		int footerLine = Math.Max(contentEndLine + 1, height - 4);
+
+		Console.SetCursorPosition(0, footerLine);
 
 		string footerL = LeftFooter ?? string.Empty;
 		string footerR = RightFooter ?? string.Empty;
@@ -60,5 +60,6 @@ public sealed class AppShell(
 		new Panel(title: null, content: new ConsoleText(footerText, colors.Muted)).Render();
 
 		Console.SetCursorPosition(0, contentEndLine);
+		Console.WriteLine();
 	}
 }
