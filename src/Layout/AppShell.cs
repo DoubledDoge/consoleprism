@@ -57,7 +57,6 @@ public sealed class AppShell(
 		string footerL = LeftFooter ?? string.Empty;
 		string footerR = RightFooter ?? string.Empty;
 
-		// Calculate spacing
 		int spaceCount = Math.Max(0, width - 4 - footerL.Length - footerR.Length);
 		string footerText = footerL + new string(' ', spaceCount) + footerR;
 
