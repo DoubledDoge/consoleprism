@@ -208,47 +208,82 @@ panel.Render();
 ```csharp
 using ConsolePrism.Layout;
 
-Row layout = new Row(spacing: 1)  // 1 blank line between each component
+Row row = new(
+	spacing: 1,
+	new ConsoleText("Header"),
+	new Panel(title: "Info", content: new ConsoleText("Details...")),
+	new ConsoleText("Footer")
+);
+
+row.Render();
+
+// Alternatively through Fluent API:
+Row fluentRow = new Row(spacing: 1)
     .Add(new ConsoleText("Header"))
-    .Add(new Panel(title: "Info", content: new Text("Details...")))
+    .Add(new Panel(title: "Info", content: new ConsoleText("Details...")))
     .Add(new ConsoleText("Footer"));
 
-layout.Render();
+fluentRow.Render();
 ```
 
 ### Viewport
 ```csharp
 using ConsolePrism.Layout;
 
-Viewport viewport = new Viewport(height: 10)  // Show 10 lines at a time
+Viewport viewport = new(
+	height: 2,
+	new ConsoleText("Line 1"),
+	new ConsoleText("Line 2"),
+	new ConsoleText("Line 3"),
+	new ConsoleText("Line 4"),
+	new ConsoleText("Line 5")
+);
+
+viewport.Render();
+
+// Alternatively through Fluent API:
+Viewport fluentViewport = new Viewport(height: 10)
     .Add(new ConsoleText("Line 1"))
     .Add(new ConsoleText("Line 2"))
-    // ... 50 more lines of content (Unfortunately you'll have to write them all out individually.)
+    // ... 50+ more lines
     .Add(new ConsoleText("Line 52"));
 
-viewport.Render();  // Initially shows lines 1-10
+fluentViewport.Render();  // Initially shows lines 1-10
 
 // User can scroll
-viewport.ScrollDown(3);  // Now shows lines 4-13
-viewport.Render();
+fluentViewport.ScrollDown(3);  // Now shows lines 4-13
+fluentViewport.Render();
 
-viewport.ScrollUp(1);    // Back to lines 3-12
-viewport.Render();
+fluentViewport.ScrollUp(1);    // Back to lines 3-12
+fluentViewport.Render();
 
-viewport.ScrollToTop();  // Back to lines 1-10
-viewport.Render();
+fluentViewport.ScrollToTop();  // Back to lines 1-10
+fluentViewport.Render();
+
+// Users can also interact with the viewport itself through up/down arrow keys:
+fluenViewport.Interact();
 ```
 
 ### Columns
 ```csharp
 using ConsolePrism.Layout;
 
-Column layout = new Column(gap: 2)  // 2 space gap between columns
+Column column = new(
+	gap: 2,
+	new Panel(title: "Left", content: new ConsoleText("A")),
+	new Panel(title: "Middle", content: new ConsoleText("B")),
+	new Panel(title: "Right", content: new ConsoleText("C"))
+);		
+
+column.Render();
+
+// Alternatively through Fluent API:
+Column fluentColumn = new Column(gap: 2)
     .Add(new Panel(title: "Left", content: new ConsoleText("A")))
     .Add(new Panel(title: "Middle", content: new ConsoleText("B")))
     .Add(new Panel(title: "Right", content: new ConsoleText("C")));
 
-layout.Render();
+fluentColumn.Render();
 ```
 
 ### App Shell
