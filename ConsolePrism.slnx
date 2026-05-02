@@ -1,5 +1,5 @@
 ﻿<Solution
-	Version="1.2.5"
+	Version="1.3.0"
 	Description="Another opinionated console UI framework for .NET applications."
 >
 	<Configurations>
