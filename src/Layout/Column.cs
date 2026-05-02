@@ -15,9 +15,11 @@ using Interfaces;
 /// </remarks>
 /// <param name="renderer">The renderer to write output to.</param>
 /// <param name="gap">The number of space characters inserted between columns.</param>
-public sealed class Column(IRenderer renderer, int gap) : ComponentBase
+/// <param name="children">The child components to add.</param>
+public sealed class Column(IRenderer renderer, int gap, params IRenderable[] children)
+	: ComponentBase
 {
-	private readonly List<IRenderable> _children = [];
+	private readonly List<IRenderable> _children = [.. children];
 	private readonly List<StringRenderer> _bufferRenderers = [];
 	private int Gap { get; } = gap;
 
@@ -25,8 +27,9 @@ public sealed class Column(IRenderer renderer, int gap) : ComponentBase
 	/// Initializes a new <see cref="Column"/> using the default console renderer.
 	/// </summary>
 	/// <param name="gap">The number of space characters inserted between columns.</param>
-	public Column(int gap)
-		: this(ConsoleRenderer.Instance, gap) { }
+	/// <param name="children">The child components to add.</param>
+	public Column(int gap, params IRenderable[] children)
+		: this(ConsoleRenderer.Instance, gap, children) { }
 
 	/// <summary>
 	/// Adds a child component to this column layout.

@@ -13,10 +13,13 @@ using Interfaces;
 /// </summary>
 /// <param name="renderer">The renderer to write output to.</param>
 /// <param name="height">The number of visible lines in the viewport.</param>
-public sealed class Viewport(IRenderer renderer, int height = 20) : ComponentBase, IInteractable
+/// <param name="children">The child components to add.</param>
+public sealed class Viewport(IRenderer renderer, int height = 20, params IRenderable[] children)
+	: ComponentBase,
+		IInteractable
 {
 	private IRenderer _renderer = renderer;
-	private readonly List<IRenderable> _children = [];
+	private readonly List<IRenderable> _children = [.. children];
 	private int Height { get; } = height;
 
 	/// <summary>
@@ -29,8 +32,9 @@ public sealed class Viewport(IRenderer renderer, int height = 20) : ComponentBas
 	/// Initializes a new <see cref="Viewport"/> using the default console renderer.
 	/// </summary>
 	/// <param name="height">The number of visible lines in the viewport.</param>
-	public Viewport(int height = 20)
-		: this(ConsoleRenderer.Instance, height) { }
+	/// <param name="children">The child components to add.</param>
+	public Viewport(int height = 20, params IRenderable[] children)
+		: this(ConsoleRenderer.Instance, height, children) { }
 
 	/// <summary>Adds a child component to the viewport's content.</summary>
 	/// <param name="child">The component to add.</param>

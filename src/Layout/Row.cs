@@ -10,18 +10,21 @@ using Interfaces;
 /// </summary>
 /// <param name="renderer">The renderer to write output to.</param>
 /// <param name="spacing">The number of blank lines inserted between each child component.</param>
-public sealed class Row(IRenderer renderer, int spacing = 0) : ComponentBase
+/// <param name="children">The child components to add.</param>
+public sealed class Row(IRenderer renderer, int spacing = 0, params IRenderable[] children)
+	: ComponentBase
 {
+	private readonly List<IRenderable> _children = [.. children];
 	private IRenderer _renderer = renderer;
-	private readonly List<IRenderable> _children = [];
 	private int Spacing { get; } = spacing;
 
 	/// <summary>
 	/// Initializes a new <see cref="Row"/> using the default console renderer.
 	/// </summary>
 	/// <param name="spacing">The number of blank lines inserted between each child component.</param>
-	public Row(int spacing = 0)
-		: this(ConsoleRenderer.Instance, spacing) { }
+	/// <param name="children">The child components to add.</param>
+	public Row(int spacing = 0, params IRenderable[] children)
+		: this(ConsoleRenderer.Instance, spacing, children) { }
 
 	/// <summary>
 	/// Adds a child component to this row.
