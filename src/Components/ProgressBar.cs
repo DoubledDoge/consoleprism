@@ -74,6 +74,8 @@ public sealed class ProgressBar(
 		int startLeft = Console.CursorLeft;
 		int startTop = Console.CursorTop;
 
+		bool isPhysicalConsole = _renderer is ConsoleRenderer;
+
 		if (!string.IsNullOrEmpty(Label))
 		{
 			_renderer.WriteColored($"{Label}: ", colors.ProgressBarText);
@@ -83,7 +85,8 @@ public sealed class ProgressBar(
 		_renderer.WriteColored(new string('█', filledWidth), colors.ProgressBarComplete);
 		_renderer.WriteColored(new string('░', emptyWidth), colors.ProgressBarIncomplete);
 		_renderer.WriteColored($"] {percentage:P0}", colors.ProgressBarText);
-		if (InPlace)
+
+		if (InPlace && isPhysicalConsole)
 		{
 			ConsoleHelper.HideCursor();
 			_renderer.SetCursorPosition(startLeft, startTop);
