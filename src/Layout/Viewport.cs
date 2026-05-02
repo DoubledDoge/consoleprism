@@ -47,11 +47,34 @@ public sealed class Viewport(IRenderer renderer, int height = 20, params IRender
 
 	/// <summary>Scrolls the viewport up by the specified number of lines.</summary>
 	/// <param name="lines">Number of lines to scroll. Defaults to 1.</param>
-	public void ScrollUp(int lines = 1) => ScrollOffset = Math.Max(0, ScrollOffset - lines);
+	public void ScrollUp(int lines = 1)
+	{
+		if (lines <= 0)
+		{
+			return;
+		}
+
+		ScrollOffset = Math.Max(0, ScrollOffset - lines);
+	}
 
 	/// <summary>Scrolls the viewport down by the specified number of lines.</summary>
 	/// <param name="lines">Number of lines to scroll. Defaults to 1.</param>
-	public void ScrollDown(int lines = 1) => ScrollOffset += lines;
+	public void ScrollDown(int lines = 1)
+	{
+		if (lines <= 0)
+		{
+			return;
+		}
+
+		if (int.MaxValue - ScrollOffset < lines)
+		{
+			ScrollOffset = int.MaxValue;
+		}
+		else
+		{
+			ScrollOffset += lines;
+		}
+	}
 
 	/// <summary>Resets the scroll position to the top.</summary>
 	public void ScrollToTop() => ScrollOffset = 0;
