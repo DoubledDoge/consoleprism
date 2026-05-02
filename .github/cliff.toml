@@ -1,6 +1,6 @@
 [remote.github]
 owner = "DoubledDoge"
-repo = "typeguard"
+repo = "consoleprism"
 
 [changelog]
 header = ""
@@ -9,7 +9,7 @@ body = """
 {% for group, commits in commits | group_by(attribute="group") %}
 ### {{ group | upper_first }}
 {% for commit in commits %}
-- {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/DoubledDoge/TypeGuard/commit/{{ commit.id }}))
+- {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/DoubledDoge/ConsolePrism/commit/{{ commit.id }}))
 {% endfor %}
 {% endfor %}
 
@@ -21,7 +21,7 @@ body = """
 {% endif %}\n
 """
 trim = true
-footer = "{% if previous.version %}**Full Changelog**: https://github.com/DoubledDoge/TypeGuard/compare/{{ previous.version }}...{{ version }}{% endif %}"
+footer = "{% if previous.version %}**Full Changelog**: https://github.com/DoubledDoge/ConsolePrism/compare/{{ previous.version }}...{{ version }}{% endif %}"
 
 [git]
 conventional_commits = true
