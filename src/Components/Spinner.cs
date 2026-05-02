@@ -34,7 +34,7 @@ public sealed class Spinner(
 	/// <summary>
 	/// An optional label displayed alongside the spinner.
 	/// </summary>
-	public string? Label { get; } = label;
+	public string? Label { get; set; } = label;
 	private int IntervalMs { get; } = intervalMs;
 
 	/// <summary>A classic braille dot spinner.</summary>
