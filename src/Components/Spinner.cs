@@ -30,7 +30,11 @@ public sealed class Spinner(
 	private CancellationTokenSource? _cts;
 	private Task? _animationTask;
 	private bool _disposed;
-	private string? Label { get; } = label;
+
+	/// <summary>
+	/// An optional label displayed alongside the spinner.
+	/// </summary>
+	public string? Label { get; } = label;
 	private int IntervalMs { get; } = intervalMs;
 
 	/// <summary>A classic braille dot spinner.</summary>
