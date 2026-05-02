@@ -20,22 +20,48 @@ public static class ConsoleHelper
 	/// <summary>Clears the line the cursor is currently on.</summary>
 	public static void ClearCurrentLine() => ClearLine(Console.CursorTop);
 
-	/// <summary>Moves the cursor to the specified console coordinates.</summary>
+	/// <summary>Moves the cursor to the specified console coordinates if the console is not output redirected.</summary>
 	/// <param name="x">The column position.</param>
 	/// <param name="y">The row position.</param>
-	public static void MoveCursor(int x, int y) => Console.SetCursorPosition(x, y);
+	public static void MoveCursor(int x, int y)
+	{
+		if (!Console.IsOutputRedirected)
+		{
+			Console.SetCursorPosition(x, y);
+		}
+	}
 
-	/// <summary>Hides the console cursor.</summary>
-	public static void HideCursor() => Console.CursorVisible = false;
+	/// <summary>Hides the console cursor if the console is not output redirected.</summary>
+	public static void HideCursor()
+	{
+		if (!Console.IsOutputRedirected)
+		{
+			Console.CursorVisible = false;
+		}
+	}
 
-	/// <summary>Shows the console cursor.</summary>
-	public static void ShowCursor() => Console.CursorVisible = true;
+	/// <summary>Shows the console cursor if the console is not output redirected.</summary>
+	public static void ShowCursor()
+	{
+		if (!Console.IsOutputRedirected)
+		{
+			Console.CursorVisible = true;
+		}
+	}
 
-	/// <summary>Returns the current cursor position as an (X, Y) tuple.</summary>
-	public static (int X, int Y) CursorPosition => (Console.CursorLeft, Console.CursorTop);
+	/// <summary>
+	/// Returns the current cursor position as an (X, Y) tuple.
+	/// Falls back to (0,0) in output redirected environments.
+	/// </summary>
+	public static (int X, int Y) CursorPosition =>
+		Console.IsOutputRedirected ? (0, 0) : (Console.CursorLeft, Console.CursorTop);
 
-	/// <summary>Returns the current console window dimensions as a (Width, Height) tuple.</summary>
-	public static (int Width, int Height) WindowSize => (Console.WindowWidth, Console.WindowHeight);
+	/// <summary>
+	/// Returns the current console window dimensions as a (Width, Height) tuple.
+	/// Falls back to (80,24) in output redirected environments.
+	/// </summary>
+	public static (int Width, int Height) WindowSize =>
+		Console.IsOutputRedirected ? (80, 24) : (Console.WindowWidth, Console.WindowHeight);
 
 	/// <summary>
 	/// Sets the console output encoding.
