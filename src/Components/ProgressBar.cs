@@ -31,7 +31,7 @@ public sealed class ProgressBar(
 	private int BarWidth { get; } = barWidth;
 
 	/// <summary>Gets or sets the current progress value of the bar.</summary>
-	private int Current { get; set; } = current;
+	public int Current { get; set; } = current;
 
 	/// <summary>
 	/// Initializes a new <see cref="ProgressBar"/> using the default console renderer.
