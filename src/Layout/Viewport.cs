@@ -1,3 +1,5 @@
+using ConsolePrism.Core;
+
 namespace ConsolePrism.Layout;
 
 using Components;
@@ -11,7 +13,7 @@ using Interfaces;
 /// </summary>
 /// <param name="renderer">The renderer to write output to.</param>
 /// <param name="height">The number of visible lines in the viewport.</param>
-public sealed class Viewport(IRenderer renderer, int height = 20) : ComponentBase
+public sealed class Viewport(IRenderer renderer, int height = 20) : ComponentBase, IInteractable
 {
 	private IRenderer _renderer = renderer;
 	private readonly List<IRenderable> _children = [];
@@ -87,5 +89,38 @@ public sealed class Viewport(IRenderer renderer, int height = 20) : ComponentBas
 		{
 			_renderer.WriteLine(line);
 		}
+	}
+
+	/// <summary>
+	/// Starts the interaction loop and scrolls up or down based on if the up arrow or down arrow was pressed.
+	/// </summary>
+	/// <returns></returns>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	public int Interact()
+	{
+		ConsoleHelper.HideCursor();
+		int startRow = Console.CursorTop;
+		ConsoleKey key;
+
+		do
+		{
+			Console.SetCursorPosition(0, startRow);
+			Render();
+
+			key = Console.ReadKey(true).Key;
+
+			if (key == ConsoleKey.UpArrow)
+			{
+				ScrollUp();
+			}
+
+			if (key == ConsoleKey.DownArrow)
+			{
+				ScrollDown();
+			}
+		} while (key != ConsoleKey.Escape && key != ConsoleKey.Enter);
+
+		ConsoleHelper.ShowCursor();
+		return ScrollOffset;
 	}
 }
