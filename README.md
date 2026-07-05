@@ -15,6 +15,12 @@ An opinionated, component-based UI framework for .NET console applications. Buil
 
 ---
 
+## 🚨Important Note
+
+Do note that this simple project is very limited and simple in scope compared to a more advanced notable project like Spectre.Console, so use that instead if you can. Its much better than this little library that I've made for myself.
+
+---
+
 ## 📑 Table of Contents
 
 - [🚀 Features](#-features)
