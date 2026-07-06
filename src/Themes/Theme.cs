@@ -13,6 +13,7 @@ public class Theme
 	public BorderStyle Border { get; init; } = BorderStyle.Single;
 
 	/// <summary>Gets the currently active global theme.</summary>
+	/// <remarks>Only really suitable for single-threaded console apps as this is a shared mutable global state.</remarks>
 	public static Theme Current { get; private set; } = new();
 
 	/// <summary>
