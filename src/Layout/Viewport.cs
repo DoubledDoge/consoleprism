@@ -1,8 +1,7 @@
-using ConsolePrism.Core;
-
 namespace ConsolePrism.Layout;
 
 using Components;
+using Core;
 using Core.Renderers;
 using Interfaces;
 

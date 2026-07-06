@@ -1,6 +1,6 @@
-using ConsolePrism.Themes;
-
 namespace ConsolePrism.Interfaces;
+
+using Themes;
 
 /// <summary>
 /// Base interface for all ConsolePrism UI components.
