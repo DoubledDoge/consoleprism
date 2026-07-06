@@ -169,7 +169,7 @@ using ConsolePrism.Components;
 
 new Notification("File saved!", false, NotificationLevel.Success).Render();
 new Notification("Low disk space.", false, NotificationLevel.Warning).Render();
-new Notification("Connection failed.", false NotificationLevel.Error).Render();
+new Notification("Connection failed.", false, NotificationLevel.Error).Render();
 
 // Transient notification
 new Notification("Autosaving...", false, NotificationLevel.Info, 2000).Render();

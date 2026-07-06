@@ -25,7 +25,6 @@ public sealed class Viewport(IRenderer renderer, int height = 20, params IRender
 	/// <summary>
 	/// Gets the current scroll offset (zero-based line index of the top visible line).
 	/// </summary>
-	// ReSharper disable once MemberCanBePrivate.Global
 	public int ScrollOffset { get; private set; }
 
 	/// <summary>
@@ -118,8 +117,7 @@ public sealed class Viewport(IRenderer renderer, int height = 20, params IRender
 	/// <summary>
 	/// Starts the interaction loop and scrolls up or down based on if the up arrow or down arrow was pressed.
 	/// </summary>
-	/// <returns></returns>
-	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	/// <returns>The scroll offset depending on the key.</returns>
 	public int Interact()
 	{
 		ConsoleHelper.HideCursor();
