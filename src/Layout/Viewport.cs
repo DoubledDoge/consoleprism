@@ -104,10 +104,7 @@ public sealed class Viewport(IRenderer renderer, int height = 20, params IRender
 			child.Render(sr);
 		}
 
-		string[] allLines = sr.Output.Split(
-			Environment.NewLine,
-			StringSplitOptions.RemoveEmptyEntries
-		);
+		string[] allLines = sr.Output.Split(Environment.NewLine);
 
 		int maxOffset = Math.Max(0, allLines.Length - Height);
 		ScrollOffset = Math.Min(ScrollOffset, maxOffset);
