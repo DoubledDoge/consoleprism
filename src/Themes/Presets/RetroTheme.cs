@@ -9,7 +9,7 @@ public static class RetroTheme
 	/// <summary>Gets the retro terminal theme instance.</summary>
 	public static readonly Theme Instance = new()
 	{
-		Colors = new ColorScheme
+		Colors = new()
 		{
 			Error = ConsoleColor.Red,
 			Success = ConsoleColor.Yellow,

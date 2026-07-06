@@ -9,7 +9,7 @@ public static class MonochromeTheme
 	/// <summary>Gets the monochrome theme instance.</summary>
 	public static readonly Theme Instance = new()
 	{
-		Colors = new ColorScheme
+		Colors = new()
 		{
 			Error = ConsoleColor.White,
 			Success = ConsoleColor.White,

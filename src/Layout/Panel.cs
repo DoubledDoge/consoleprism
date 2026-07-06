@@ -141,9 +141,9 @@ public sealed class Panel(
 				// Left-align within contentWidth, with explicit padding either side
 				string padded =
 					line.Length > contentWidth ? line[..contentWidth] : line.PadRight(contentWidth);
-				_renderer.Write(new string(' ', HorizontalPadding));
+				_renderer.Write(new(' ', HorizontalPadding));
 				_renderer.Write(padded);
-				_renderer.Write(new string(' ', HorizontalPadding));
+				_renderer.Write(new(' ', HorizontalPadding));
 			}
 
 			_renderer.WriteColoredLine(border.Vertical.ToString(), colors.Primary);
@@ -161,13 +161,13 @@ public sealed class Panel(
 			int left = remaining / 2;
 			int right = remaining - left;
 
-			_renderer.WriteColored(new string(border.Horizontal, left), colors.Primary);
+			_renderer.WriteColored(new(border.Horizontal, left), colors.Primary);
 			_renderer.WriteColored(label, colors.MenuTitle);
-			_renderer.WriteColored(new string(border.Horizontal, right), colors.Primary);
+			_renderer.WriteColored(new(border.Horizontal, right), colors.Primary);
 		}
 		else
 		{
-			_renderer.WriteColored(new string(border.Horizontal, innerWidth), colors.Primary);
+			_renderer.WriteColored(new(border.Horizontal, innerWidth), colors.Primary);
 		}
 
 		_renderer.WriteColoredLine(border.TopRight.ToString(), colors.Primary);
@@ -176,14 +176,14 @@ public sealed class Panel(
 	private void RenderBottomBorder(BorderStyle border, ColorScheme colors, int innerWidth)
 	{
 		_renderer.WriteColored(border.BottomLeft.ToString(), colors.Primary);
-		_renderer.WriteColored(new string(border.Horizontal, innerWidth), colors.Primary);
+		_renderer.WriteColored(new(border.Horizontal, innerWidth), colors.Primary);
 		_renderer.WriteColoredLine(border.BottomRight.ToString(), colors.Primary);
 	}
 
 	private void RenderEmptyRow(BorderStyle border, ColorScheme colors, int innerWidth)
 	{
 		_renderer.WriteColored(border.Vertical.ToString(), colors.Primary);
-		_renderer.Write(new string(' ', innerWidth));
+		_renderer.Write(new(' ', innerWidth));
 		_renderer.WriteColoredLine(border.Vertical.ToString(), colors.Primary);
 	}
 }

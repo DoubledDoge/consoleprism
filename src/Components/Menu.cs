@@ -191,7 +191,7 @@ public sealed class Menu(
 
 		// Top border
 		_renderer.WriteColored(border.TopLeft.ToString(), colors.MenuBorder);
-		_renderer.WriteColored(new string(border.Horizontal, menuWidth), colors.MenuBorder);
+		_renderer.WriteColored(new(border.Horizontal, menuWidth), colors.MenuBorder);
 		_renderer.WriteColoredLine(border.TopRight.ToString(), colors.MenuBorder);
 
 		// Title row
@@ -201,7 +201,7 @@ public sealed class Menu(
 
 		// Title separator
 		_renderer.WriteColored(border.TeeLeft.ToString(), colors.MenuBorder);
-		_renderer.WriteColored(new string(border.Horizontal, menuWidth), colors.MenuBorder);
+		_renderer.WriteColored(new(border.Horizontal, menuWidth), colors.MenuBorder);
 		_renderer.WriteColoredLine(border.TeeRight.ToString(), colors.MenuBorder);
 
 		// Options
@@ -215,13 +215,13 @@ public sealed class Menu(
 			ConsoleColor optionColor = i == selectedIndex ? colors.MenuSelected : colors.MenuOption;
 
 			_renderer.WriteColored($" {label} ", optionColor);
-			_renderer.WriteColored(new string(' ', Math.Max(0, padding)), optionColor);
+			_renderer.WriteColored(new(' ', Math.Max(0, padding)), optionColor);
 			_renderer.WriteColoredLine(border.Vertical.ToString(), colors.MenuBorder);
 		}
 
 		// Bottom border
 		_renderer.WriteColored(border.BottomLeft.ToString(), colors.MenuBorder);
-		_renderer.WriteColored(new string(border.Horizontal, menuWidth), colors.MenuBorder);
+		_renderer.WriteColored(new(border.Horizontal, menuWidth), colors.MenuBorder);
 		_renderer.WriteColoredLine(border.BottomRight.ToString(), colors.MenuBorder);
 	}
 

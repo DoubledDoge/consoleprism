@@ -83,7 +83,7 @@ public sealed class Notification(
 		int width = content.Length + 4;
 
 		renderer.WriteColoredLine(
-			$"{border.TopLeft}{new string(border.Horizontal, width)}{border.TopRight}",
+			$"{border.TopLeft}{new(border.Horizontal, width)}{border.TopRight}",
 			color
 		);
 
@@ -92,7 +92,7 @@ public sealed class Notification(
 		renderer.WriteColoredLine(border.Vertical.ToString(), color);
 
 		renderer.WriteColoredLine(
-			$"{border.BottomLeft}{new string(border.Horizontal, width)}{border.BottomRight}",
+			$"{border.BottomLeft}{new(border.Horizontal, width)}{border.BottomRight}",
 			color
 		);
 	}

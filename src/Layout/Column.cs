@@ -56,7 +56,7 @@ public sealed class Column(IRenderer renderer, int gap, params IRenderable[] chi
 		// Grow the renderer pool to match child count if needed
 		while (_bufferRenderers.Count < _children.Count)
 		{
-			_bufferRenderers.Add(new StringRenderer());
+			_bufferRenderers.Add(new());
 		}
 
 		int totalWidth = Console.WindowWidth;

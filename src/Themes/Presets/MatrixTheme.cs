@@ -12,7 +12,7 @@ public static class MatrixTheme
 	/// <summary>Gets the Matrix-inspired theme instance.</summary>
 	public static readonly Theme Instance = new()
 	{
-		Colors = new ColorScheme
+		Colors = new()
 		{
 			Error = ConsoleColor.Red,
 			Success = ConsoleColor.Green,

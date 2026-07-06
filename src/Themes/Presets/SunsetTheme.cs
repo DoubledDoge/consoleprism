@@ -9,7 +9,7 @@ public static class SunsetTheme
 	/// <summary>Gets the sunset-inspired theme instance.</summary>
 	public static readonly Theme Instance = new()
 	{
-		Colors = new ColorScheme
+		Colors = new()
 		{
 			Error = ConsoleColor.Red,
 			Success = ConsoleColor.Magenta,

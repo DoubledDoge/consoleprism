@@ -12,7 +12,7 @@ public static class SolarizedTheme
 	/// <summary>Gets the Solarized-inspired theme instance.</summary>
 	public static readonly Theme Instance = new()
 	{
-		Colors = new ColorScheme
+		Colors = new()
 		{
 			Error = ConsoleColor.Red,
 			Success = ConsoleColor.DarkCyan,

@@ -8,7 +8,7 @@ public static class NordTheme
 	/// <summary>Gets the Nord-inspired theme instance.</summary>
 	public static readonly Theme Instance = new()
 	{
-		Colors = new ColorScheme
+		Colors = new()
 		{
 			Error = ConsoleColor.Red,
 			Success = ConsoleColor.Cyan,

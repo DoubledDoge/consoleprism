@@ -109,7 +109,7 @@ public sealed class Spinner(
 		ConsoleHelper.SetEncoding(Encoding.UTF8);
 
 		ConsoleHelper.HideCursor();
-		_cts = new CancellationTokenSource();
+		_cts = new();
 		CancellationToken token = _cts.Token;
 
 		_animationTask = Task.Run(

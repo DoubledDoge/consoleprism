@@ -82,8 +82,8 @@ public sealed class ProgressBar(
 		}
 
 		_renderer.Write("[");
-		_renderer.WriteColored(new string('█', filledWidth), colors.ProgressBarComplete);
-		_renderer.WriteColored(new string('░', emptyWidth), colors.ProgressBarIncomplete);
+		_renderer.WriteColored(new('█', filledWidth), colors.ProgressBarComplete);
+		_renderer.WriteColored(new('░', emptyWidth), colors.ProgressBarIncomplete);
 		_renderer.WriteColored($"] {percentage:P0}", colors.ProgressBarText);
 
 		if (InPlace && isPhysicalConsole)
