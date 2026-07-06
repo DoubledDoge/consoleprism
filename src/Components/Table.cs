@@ -19,7 +19,7 @@ using Themes;
 /// <param name="columnWidths">Optional explicit column widths.</param>
 public sealed class Table(
 	string[] headers,
-	TableCell[][]? data,
+	IReadOnlyList<IReadOnlyList<TableCell>>? data,
 	IRenderer renderer,
 	int[]? columnWidths = null
 ) : ComponentBase
@@ -29,29 +29,37 @@ public sealed class Table(
 	/// </summary>
 	/// <param name="headers">Column header labels.</param>
 	/// <param name="data">
-	/// A jagged array of cell values, where the first dimension is rows
-	/// and the second is columns. May be <see langword="null"/> to render headers only.
+	/// Row-major cell values, where the outer collection is rows and the inner
+	/// collection is columns. May be <see langword="null"/> to render headers only.
 	/// </param>
 	/// <param name="columnWidths">
 	/// Optional explicit column widths. When <see langword="null"/>, widths are
 	/// calculated automatically from content.
 	/// </param>
-	public Table(string[] headers, TableCell[][]? data, int[]? columnWidths = null)
+	public Table(
+		string[] headers,
+		IReadOnlyList<IReadOnlyList<TableCell>>? data,
+		int[]? columnWidths = null
+	)
 		: this(headers, data, ConsoleRenderer.Instance, columnWidths) { }
 
 	/// <summary>
-	/// Initializes a new <see cref="Table"/> with the default console renderer using a string array.
+	/// Initializes a new <see cref="Table"/> with the default console renderer using plain strings.
 	/// </summary>
 	/// <param name="headers">Column header labels.</param>
 	/// <param name="data">
-	/// A jagged array of cell values, where the first dimension is rows
-	/// and the second is columns. May be <see langword="null"/> to render headers only.
+	/// Row-major cell values, where the outer collection is rows and the inner
+	/// collection is columns. May be <see langword="null"/> to render headers only.
 	/// </param>
 	/// <param name="columnWidths">
 	/// Optional explicit column widths. When <see langword="null"/>, widths are
 	/// calculated automatically from content.
 	/// </param>
-	public Table(string[] headers, string[][]? data, int[]? columnWidths = null)
+	public Table(
+		string[] headers,
+		IReadOnlyList<IReadOnlyList<string>>? data,
+		int[]? columnWidths = null
+	)
 		: this(headers, ConvertToStringCells(data), ConsoleRenderer.Instance, columnWidths) { }
 
 	/// <inheritdoc />
@@ -60,8 +68,14 @@ public sealed class Table(
 	/// <inheritdoc />
 	protected override IRenderer? SwapRenderer(IRenderer? swapRenderer) => null;
 
-	private static TableCell[][]? ConvertToStringCells(string[][]? data) =>
-		data?.Select(row => row.Select(cell => (TableCell)cell).ToArray()).ToArray();
+	private static IReadOnlyList<TableCell>[]? ConvertToStringCells(
+		IReadOnlyList<IReadOnlyList<string>>? data
+	) =>
+		data
+			?.Select(
+				IReadOnlyList<TableCell> (row) => row.Select(cell => (TableCell)cell).ToArray()
+			)
+			.ToArray();
 
 	/// <inheritdoc/>
 	public override void Render()
@@ -75,13 +89,28 @@ public sealed class Table(
 			return;
 		}
 
+		if (data is not null)
+		{
+			for (int row = 0; row < data.Count; row++)
+			{
+				if (data[row].Count != headers.Length)
+				{
+					throw new ArgumentException(
+						$"Row {row} has {data[row].Count} cell(s) but the table has {headers.Length} header(s). "
+							+ "Every row must have exactly one cell per header.",
+						nameof(data)
+					);
+				}
+			}
+		}
+
 		int[] widths = columnWidths ?? CalculateColumnWidths();
 
 		DrawTopBorder(widths);
 		DrawHeaderRow(widths);
 		DrawSeparator(widths);
 
-		if (data is not null && data.GetLength(0) > 0)
+		if (data is not null && data.Count > 0)
 		{
 			DrawDataRows(widths);
 		}
@@ -101,7 +130,7 @@ public sealed class Table(
 
 		if (data is not null)
 		{
-			int rowCount = data.Length;
+			int rowCount = data.Count;
 			for (int row = 0; row < rowCount; row++)
 			{
 				for (int col = 0; col < columnCount; col++)
@@ -191,11 +220,11 @@ public sealed class Table(
 	private void DrawDataRows(int[] widths)
 	{
 		(ColorScheme colors, BorderStyle border) = (ActiveTheme.Colors, ActiveTheme.Border);
-		int rowCount = data!.Length;
+		int rowCount = data!.Count;
 
 		for (int row = 0; row < rowCount; row++)
 		{
-			int columnCount = data[row].Length;
+			int columnCount = data[row].Count;
 			List<TableCell[]> wrappedRows = WrapRow(row, widths);
 
 			foreach (TableCell[] wrappedLine in wrappedRows)
@@ -218,7 +247,7 @@ public sealed class Table(
 
 	private List<TableCell[]> WrapRow(int row, int[] widths)
 	{
-		int columnCount = data![row].Length;
+		int columnCount = data![row].Count;
 		List<string>[] cellLines = new List<string>[columnCount];
 		int maxLines = 1;
 
